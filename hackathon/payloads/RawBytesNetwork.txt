@@ -1,0 +1,19 @@
+# Raw Bytes Over Network (General Skills)
+
+# Send non-printable bytes to a networked program that asks for specific hex bytes.
+# Cannot type 0xFF/0x00/NUL from a terminal -> must send over a raw socket.
+
+# Python one-liner (no pwntools needed)
+python -c "import socket;s=socket.create_connection(('HOST',PORT));print(s.recv(4096));s.sendall(b'\xff\xff\xff\n');print(s.recv(4096))"
+
+# Send byte 0xNN N times + newline (fgets/scanf readers need the newline)
+# payload = bytes([0xNN]) * N + b'\n'
+
+# Parse an interactive prompt with regex:
+#   0x([0-9A-Fa-f]{2})   -> byte value
+#   (\d+) times           -> repetition count
+#
+# Reusable script:
+python scripts/bytemancy_solver.py <host> <port>
+
+# Note: 'FF' as a string is ASCII text, NOT the byte 0xFF. Send actual bytes.

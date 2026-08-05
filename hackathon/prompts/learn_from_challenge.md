@@ -54,3 +54,19 @@ For each solved challenge, produce:
 
 You are not just recording what happened; you are building a reusable knowledge base for future challenges.
 If the current challenge reveals a missing skill, payload, script or playbook, create it automatically instead of only updating existing files.
+
+Whenever I say:
+
+learn
+
+You should automatically:
+
+- Update the framework
+- Update skills
+- Update payloads
+- Update scripts
+- Update playbooks
+- Update notes
+- Create writeup
+- Avoid duplicates
+- Report modified files

