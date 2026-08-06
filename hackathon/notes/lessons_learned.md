@@ -44,9 +44,23 @@
 - **Reusable technique**: Determine the filter rule first; if punctuation is stripped, don't spell commands with quotes — wrap the whole action in an opaque construct and use `*`/`<` to avoid typing filenames. Interactive jails need a paramiko prompt loop. See `skills/linux/BashJail.md`, `scripts/ssh_interactive_shell.py`, `payloads/Linux.txt`.
 
 
+## Crystal Peak (picoCTF 2026) - IDOR via MD5-Obfuscated Object Reference
+- **What happened**: Login page leaked guest creds in an HTML comment (`guest@picoctf.org` / `guest`). Login redirected to `/profile/user/<32-hex-token>`; the profile printed "Access level: Guest (ID: 3000)" and refused the flag for non-top-tier users.
+- **How we found it**: Noticed the 32-hex token format (MD5 length) and that the profile page leaked the user's numeric ID; verified `md5("3000")` matched the token -> scheme = `md5(str(user_id))`.
+- **How we exploited it**: Enumerated small ID ranges (1..24 and 2995..3025), requesting `/profile/user/md5(i)`; ID 3019 returned `Welcome, admin! Here is the flag: picoCTF{id0r_unl0ck_ee526012}`.
+- **Fix**: Never use a hash as access control. Enforce server-side authorization on every object access (check requester role/ownership); use unpredictable identifiers only as a complement, not a substitute.
+- **Reusable technique**: Hash-obfuscated object references are IDOR, not crypto — read your own profile to recover your ID, confirm the hash on your own value, then enumerate candidate IDs. 404 vs 200 distinguishes valid objects. See `skills/web/AuthBypass.md`, `scripts/idor_enumerate.py`, `payloads/AuthBypass.txt`.
+
 ## byp4ss3d (picoCTF picoMini - CMU-Africa) - File Upload .htaccess RCE
 - **What happened**: Registration portal uploaded ID cards to \images/\ with a server-side filter. The filter was a **blocklist** of only .php-ish extensions (rejected .php, .phtml, .PHP) while ACCEPTING .png/.jpg/.gif AND, critically, a file named .htaccess.
 - **How we found it**: Uploaded probe files (.txt, .php, .png, .htaccess, .phtml, .jpeg, case-variant) and read accept/reject responses to map the filter rule and the allowed extensions.
 - **How we exploited it**: Uploaded an \.htaccess\ containing \AddType application/x-httpd-php .png\, then uploaded \shell2.png\ with \<?php system(\['c']); ?>\. Requesting \images/shell2.png?c=id\ ran commands; \cat ../../flag.txt\ (flag was outside web root, at the filesystem root alongside \html/\) printed the flag.
 - **Fix**: Use a strict image **allowlist** (extension + magic bytes + MIME), never a php-extension blocklist; **always reject .htaccess** (and dotfiles); store uploads in dirs with PHP execution disabled; serve via X-Sendfile or a handler that forces disposition.
 - **Reusable technique**: When an upload filter is a blocklist, map it with probes; if .htaccess is allowed, force Apache to run an allowed extension as PHP (AddType/SetHandler) then upload a shell in that extension. No magic-byte prefix needed because it is the server handler that runs PHP. Flags often sit outside the web root -> use ../.. See \skills/web/FileUpload.md\, \payloads/PHP.txt\.
+
+## PIE TIME 2 (picoCTF 2025) - Format String Leak + Function Pointer Jump
+- **What happened**: PIE binary echoed the user's name with `printf(buffer)` (format string) and then let the user enter ANY memory address, calling it via `((void(*)())val)()`. A `win()` function printed the flag but was never called in normal flow. PIE+ASLR randomized the code base every run.
+- **How we found it**: Fed `%p %p ...` / `%19$p` as the name -> leaked `0x...441` = `main+0x41`. `nm` showed `main=0x133d`, `win=0x12a7` (offset 0x96, i.e. win is 0x96 bytes before main).
+- **How we exploited it**: `win = leak - 0x41 - 0x96 = leak - 0xD7`; sent `hex(win)` at the "enter the address to jump to" prompt -> "You won!" + flag. One connection does both stages.
+- **Fix**: Never call `printf(user_input)` (use `printf("%s", buf)`); never call an attacker-controlled function pointer from a `scanf("%lx")` value.
+- **Reusable technique**: Format-string leaks defeat PIE/ASLR for function-pointer-jump / ret2win challenges. Positional `%N$p` reads a specific slot (19 -> main+0x41 here); compute the win offset with `nm` (offsets are stable even though the base is random). A custom `segfault_handler` printing "Segfault Occurred" is just a retry signal for a wrong address. See `skills/pwn/PIEBypass.md`, `scripts/pwn_pie_leak.py`, `payloads/FormatString.txt`.

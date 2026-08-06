@@ -13,7 +13,13 @@ Login protected by MFA / flag gated by role:
  │    ├── Code stored in signed session cookie? -> Decode cookie, READ the code (signed != encrypted)
  │    ├── Endpoint has no rate limit? -> Brute-force numeric space (e.g. 1000-9999)
  │    └── OTP not invalidated per attempt? -> Keep guessing until correct
- └── Session itself forgeable? -> Client-side sessions (Flask/JWT): decode, tamper, weak secret, alg=none
+  └── Session itself forgeable? -> Client-side sessions (Flask/JWT): decode, tamper, weak secret, alg=none
+Resource guarded by role, but the object reference is guessable?
+ ├── URL token looks like a hash? (32 hex=MD5, 40=SHA-1, 64=SHA-256, base64?)
+ │    ├── Get your OWN resource and read the ID it reveals (profile pages often print it)
+ │    ├── Hash that ID with the suspect algorithm -> confirms the whole scheme
+ │    └── Enumerate candidate IDs (small ranges, "N users" hints) -> hash each -> request
+ └── Plain numeric/sequential IDs in URL? -> IDOR: walk the range directly (1..N)
 ```
 
 ## Recon Checklist
@@ -81,6 +87,24 @@ for otp in range(1000, 10000)
 ## Example CTF Scenario
 "No FA" (picoCTF 2026): leaked `users.db` with unsalted SHA-256 admin hash -> cracked `apple@123` via rockyou. Login triggered 2FA; the 4-digit OTP was stored in the signed-but-readable Flask session cookie -> decoded, submitted, flag retrieved.
 
+## IDOR (Obfuscated/Guessable Object Reference)
+### Detection Checklist
+- [ ] Profile/account URL contains an "opaque" token: 32 hex (MD5), 40 hex (SHA-1), 64 hex (SHA-256), base64, or a long random-looking string.
+- [ ] The page for your own object leaks your numeric/role ID (e.g. "Guest (ID: 3000)").
+- [ ] Hint mentions a small population ("about 20 employees", "N users").
+- [ ] 404 on non-existent IDs vs 200 with different content on valid ones (distinguishes valid objects).
+
+### Exploitation Workflow
+1. Log in with leaked/default credentials (check HTML comments for `<!-- Email: ... Password: ... -->`).
+2. Open your own profile and note the numeric/role ID it reveals.
+3. Verify the obfuscation: `md5("3000")` == the token in your profile URL? Then scheme = `md5(str(id))`.
+4. Enumerate candidate IDs near the known one and small integers; hash each and request the profile.
+5. On `200` with "admin"/role content -> read the flag. 404 / "insufficient privileges" -> keep walking.
+
+### Reusable Code
+- `scripts/idor_enumerate.py` (hash-scheme aware IDOR enumeration over a range).
+- Plain-sequential IDs need no hashing: just walk the range.
+
 ## Python Automation Example
 ```python
 import base64, json, zlib
@@ -106,6 +130,9 @@ def decode_flask(cookie):
 - 4-digit OTP = only 9000 values; without rate limiting it is trivially brute-forceable.
 - Unsalted fast hashes (MD5/SHA-1/SHA-256) -> always try rockyou/hashcat offline first.
 - "No FA" / "2FA" naming hints usually point to a broken MFA implementation.
+- A hash hiding an object ID is NOT security: it is just encoding. Read your own profile to recover
+  the ID, confirm the hash scheme on YOUR OWN id, then enumerate — no cracking needed.
+- "Obscurity isn't security" / "not directly exposed" hints => IDOR on a hashed/obfuscated reference.
 
 ## References
 - OWASP Authentication Cheat Sheet

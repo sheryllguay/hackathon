@@ -18,8 +18,10 @@ graph TD
 
 ## Enumeration
 - For Binaries: Run `file`, `checksec`, and `strings` to identify protection mechanisms.
+- For Pwn/PIE binaries that echo your input and ask for an address to jump to (`scanf("%lx")` -> function pointer call): run `nm ./vuln | grep -wE "main|win"` for stable compile-time offsets, then leak a code pointer via a format-string in the echoed name (`%p` dump, or positional `%19$p` -> `main+0x41`). Compute `win = leak - leak_slot_off - (main_off - win_off)` (e.g. `leak - 0xD7`) and send it in stage 2. Reuse `scripts/pwn_pie_leak.py`, `payloads/FormatString.txt`, `skills/pwn/PIEBypass.md`. A "Segfault Occurred" reply = wrong address, retry.
 - For Web: Browse resources, check cookie signatures, investigate git repositories (`/.git/`).
 - For Auth/2FA challenges: inspect leaked DB attachments (`sqlite3 file.db .dump`), crack unsalted hashes offline (hashcat/rockyou), and decode Flask session cookies (signed, not encrypted) to read stored OTPs/roles.
+- For IDOR/hashed-profile challenges: log in (check HTML comments for guest creds), read YOUR numeric/role ID from your own profile page, verify the URL token scheme (`md5("your_id")` == your profile token), then enumerate candidate IDs (small ranges; "N employees/users" hints bound the space) requesting each hashed URL — 404 = no user, 200 + "admin" = flag. Reuse `scripts/idor_enumerate.py`.
 - For File Upload challenges: probe the filter with small test uploads (`.txt`, `.php`, `.png`, `.phtml`, `.htaccess`) to learn if it is a php-extension BLOCKLIST or a strict image ALLOWLIST. If `.htaccess` is accepted, upload one with `AddType application/x-httpd-php .png` (or `SetHandler` FilesMatch) then a `shell.png` containing PHP; request `shell.png?c=<cmd>` and read flags outside the web root with `../../flag.txt`. Reuse `scripts/htaccess_shell.py` and `skills/web/FileUpload.md`.
 - For Crypto: Parse files for public keys, parameters `N`, `e`, `c`, or ciphertext properties.
 - For SSH/General Skills boxes: enumerate the user (`id`, `ls -la`) and run `sudo -l` immediately. A `NOPASSWD` grant to an editor/interpreter (emacs/vim/less/python) is a privilege escalation vector - check GTFOBins and prefer non-interactive `--batch`/`-eval` invocations.
@@ -51,9 +53,16 @@ Given a gibberish string/file (General Skills / Crypto)?
  └── If base64 invalid, fall back to base32 -> hex -> URL-decoding
 
 Given a prompt asking for specific HEX bytes over a socket?
- ├── regex byte 0x([0-9A-Fa-f]{2}) + count (\d+) times
- ├── sendall(bytes([b]) * N + b'\n') -> repeat until flag prefix
- └── Use scripts/bytemancy_solver.py
+  ├── regex byte 0x([0-9A-Fa-f]{2}) + count (\d+) times
+  ├── sendall(bytes([b]) * N + b'\n') -> repeat until flag prefix
+  └── Use scripts/bytemancy_solver.py
+
+Binary prompts for a name/string then asks "enter the address to jump to"?
+  ├── Echo uses printf(user_input)? -> Format string leak (positional %N$p)
+  │    ├── Find slot leaking a code pointer (main+0x41 typical) with %p dump / gdb
+  │    ├── Compute win via nm offsets: win = leak - leak_off - (main_off - win_off)
+  │    └── Send hex(win) at the jump prompt -> flag
+  └── Program prints its own address (e.g. "Address of main: %p")? -> compute win directly
 ```
 
 ## Exploitation Steps
