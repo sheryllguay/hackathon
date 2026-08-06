@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>UCSI Agentic AI-Driven CTF 2026</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="/themes/core/static/img/favicon.ico?d=5e1835e0" type="image/x-icon">
+
+  
+
+  
+    <link rel="stylesheet" href="/themes/core/static/assets/main.e9ec7884.css">
+  
+
+  
+
+  <script  src="/themes/core/static/assets/color_mode_switcher.52334129.js"></script>
+
+  <script type="text/javascript">
+      window.init = {
+          'urlRoot': "",
+          'csrfNonce': "19e22e2af8918ff4ba4074f031ed90bf64915976612b9cb79a39c3d2a591fb11",
+          'userMode': "teams",
+          'userId': 0,
+          'userName': null,
+          'userEmail': null,
+          'userVerified': null,
+          'teamId': null,
+          'teamName': null,
+          'start': 1785983400,
+          'end': 1785996000,
+          'themeSettings': null,
+          'eventSounds': [
+            "/themes/core/static/sounds/notification.webm",
+            "/themes/core/static/sounds/notification.mp3",
+          ],
+      }
+  </script>
+
+  <script>try{document.documentElement.setAttribute('data-bs-theme','dark');}catch(e){}
+/* Monkey-patch Plotly.newPlot/react to inject dark-mode layout at the source.
+   This forces font color, bg, axis color BEFORE Plotly renders — no post-hoc fight. */
+(function(){
+  var dl={font:{color:'#e8edf3'},paper_bgcolor:'transparent',plot_bgcolor:'transparent',
+    xaxis:{color:'#e8edf3',gridcolor:'rgba(255,255,255,0.08)',linecolor:'rgba(255,255,255,0.15)'},
+    yaxis:{color:'#e8edf3',gridcolor:'rgba(255,255,255,0.08)',linecolor:'rgba(255,255,255,0.15)'},
+    legend:{font:{color:'#ffffff'}}};
+  function mg(t,s){for(var k in s){if(s[k]&&typeof s[k]==='object'&&!Array.isArray(s[k])){t[k]=t[k]||{};mg(t[k],s[k]);}else{t[k]=s[k];}}}
+  function wrap(fn){return function(){var a=[].slice.call(arguments);if(a.length>=2&&a[1]&&typeof a[1]==='object'){mg(a[1],dl);}return fn.apply(this,a);};}
+  function go(){if(window.Plotly&&!window._pDark){window.Plotly.newPlot=wrap(window.Plotly.newPlot);window.Plotly.react=wrap(window.Plotly.react);window._pDark=1;}}
+  document.addEventListener('DOMContentLoaded',go);setTimeout(go,200);setTimeout(go,800);setTimeout(go,2000);
+  /* fallback: also force-fix after render for any chart that slipped through */
+  setInterval(function(){var el=document.getElementById('score-graph');if(!el)return;el.querySelectorAll('text').forEach(function(t){t.style.setProperty('fill','#e8edf3','important');});},3000);
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --accent:#D42A3A;          /* UCSI red, slightly desaturated per taste rules */
+  --accent-ink:#ff5566;      /* hover/link only */
+  --bg:#0b0e14;              /* off-black, not #000 */
+  --bg2:#10151e; --bg3:#141b26; --bd:#222b39; --bd2:#2c3746;
+  --tx:#e8edf3; --mut:#8a97a8;
+  /* Force Bootstrap 5 component variables to dark so no white surfaces remain */
+  --bs-body-bg:#0b0e14; --bs-body-color:#e8edf3; --bs-emphasis-color:#ffffff;
+  --bs-secondary-color:#8a97a8; --bs-secondary-bg:#10151e; --bs-tertiary-bg:#141b26;
+  --bs-border-color:#222b39; --bs-link-color:#ff5566; --bs-link-hover-color:#ffffff;
+  color-scheme:dark;
+}
+html{overflow-y:scroll;}
+body{overflow-x:hidden;}
+html,body{background:var(--bg)!important;color:var(--tx)!important;
+  font-family:'Outfit',system-ui,-apple-system,sans-serif!important;}
+/* very subtle static grid, no neon glow */
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:
+    linear-gradient(transparent 96%, rgba(255,255,255,.025) 97%) 0 0/100% 38px,
+    linear-gradient(90deg, transparent 96%, rgba(255,255,255,.025) 97%) 0 0/38px 100%,
+    var(--bg);
+  mask-image:linear-gradient(180deg, rgba(0,0,0,.6), transparent 70%);}
+h1,h2,h3,h4,h5{color:#fff!important;letter-spacing:-.02em;}
+a{color:var(--accent-ink)!important;text-decoration:none;}
+a:hover{color:#fff!important;}
+p,.text-muted,small{color:var(--mut)!important;}
+main[role="main"]>.container{margin-left:auto!important;margin-right:auto!important;}
+
+/* Navbar - flat, bordered, no glow, no glyph */
+.navbar{background:rgba(11,14,20,.9)!important;border-bottom:1px solid var(--bd)!important;backdrop-filter:blur(8px);}
+.navbar .navbar-brand{font-family:'Outfit',sans-serif!important;font-weight:700!important;letter-spacing:-.01em;color:#fff!important;}
+.navbar .nav-link{color:#b7c2d0!important;}
+.navbar .nav-link:hover,.navbar .nav-link.active{color:#fff!important;}
+
+/* Jumbotron / generic panels - inner border materiality, tinted (not neon) shadow */
+.jumbotron{background:var(--bg2)!important;border:1px solid var(--bd)!important;border-radius:14px!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04), 0 24px 48px -24px rgba(0,0,0,.6)!important;}
+.jumbotron h1{font-family:'Outfit',sans-serif!important;font-weight:800!important;color:#fff!important;letter-spacing:-.03em;}
+
+/* Cards / modals */
+.card,.modal-content{background:var(--bg2)!important;border:1px solid var(--bd)!important;color:var(--tx)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.03)!important;}
+.card .card-header,.modal-header,.modal-footer{background:var(--bg3)!important;border-color:var(--bd)!important;}
+
+/* Buttons - solid accent, no glow, tactile press */
+.btn-primary{background:var(--accent)!important;border:1px solid var(--accent)!important;color:#fff!important;font-weight:600;}
+.btn-primary:hover{background:#e23644!important;border-color:#e23644!important;}
+.btn-primary:active{transform:translateY(1px);}
+.btn-outline-secondary,.btn-outline-primary{color:var(--tx)!important;border-color:var(--bd2)!important;background:transparent!important;font-weight:600;}
+.btn-outline-secondary:hover{border-color:var(--tx)!important;color:#fff!important;}
+.btn-outline-secondary:active{transform:translateY(1px);}
+
+/* Challenge tiles - flat bordered, hairline accent on hover (no glow) */
+.challenge-button{background:var(--bg2)!important;border:1px solid var(--bd)!important;color:var(--tx)!important;transition:border-color .15s, transform .15s;}
+.challenge-button:hover{border-color:var(--accent)!important;transform:translateY(-2px);}
+.solved-challenge{border-left:3px solid var(--accent)!important;}
+
+/* Tables / scoreboard - kill Bootstrap's white cell bg, force readable dark */
+.table{
+  --bs-table-bg:transparent; --bs-table-color:var(--tx);
+  --bs-table-striped-bg:rgba(255,255,255,.035); --bs-table-striped-color:var(--tx);
+  --bs-table-hover-bg:rgba(212,42,58,.12); --bs-table-hover-color:#ffffff;
+  --bs-table-active-bg:rgba(255,255,255,.05); --bs-table-active-color:var(--tx);
+  --bs-table-border-color:var(--bd);
+  color:var(--tx)!important;background-color:transparent!important;}
+.table>:not(caption)>*>*{background-color:transparent!important;color:var(--tx)!important;
+  border-color:var(--bd)!important;box-shadow:none!important;}
+.table thead th{color:var(--mut)!important;text-transform:uppercase;font-size:.74rem;letter-spacing:.08em;font-weight:600;}
+.table-striped>tbody>tr:nth-of-type(odd)>*{background-color:rgba(255,255,255,.035)!important;}
+.table-hover>tbody>tr:hover>*{background-color:rgba(212,42,58,.12)!important;color:#fff!important;}
+.table-light,.table-light>th,.table-light>td{background-color:var(--bg3)!important;color:var(--tx)!important;}
+
+/* Other surfaces that default white in BS5 light mode */
+.dropdown-menu{background:var(--bg2)!important;border:1px solid var(--bd)!important;}
+.dropdown-item{color:var(--tx)!important;}
+.dropdown-item:hover,.dropdown-item:focus{background:var(--bg3)!important;color:#fff!important;}
+.list-group-item{background:var(--bg2)!important;color:var(--tx)!important;border-color:var(--bd)!important;}
+.page-link{background:var(--bg2)!important;color:var(--tx)!important;border-color:var(--bd)!important;}
+.page-item.active .page-link{background:var(--accent)!important;border-color:var(--accent)!important;color:#fff!important;}
+.page-item.disabled .page-link{background:var(--bg2)!important;color:#5c6a7c!important;}
+.close,.btn-close{filter:invert(1) grayscale(1) brightness(1.6);}
+.text-dark,.text-black{color:var(--tx)!important;}
+.bg-white,.bg-light{background:var(--bg2)!important;color:var(--tx)!important;}
+
+/* Forms */
+.form-control,.input-group-text,select,textarea{background:var(--bg3)!important;color:var(--tx)!important;border-color:var(--bd2)!important;}
+.form-control::placeholder{color:#5c6a7c!important;}
+.form-control:focus{background:var(--bg3)!important;color:#fff!important;border-color:var(--accent)!important;box-shadow:0 0 0 3px rgba(212,42,58,.18)!important;}
+hr{border-color:var(--bd)!important;}
+.badge-primary{background:var(--accent)!important;}
+.progress{background:var(--bg3)!important;}
+.progress-bar{background:var(--accent)!important;}
+code,pre,kbd{font-family:'JetBrains Mono',monospace!important;color:#cbd5e1!important;background:rgba(255,255,255,.04)!important;}
+
+/* ===== Scoreboard graph (Plotly) legibility - broad selectors, max contrast ===== */
+/* catch every text node inside any plotly/graph container, override inline fill */
+#score-graph text, #scoregraph text, .js-plotly-plot text, .plotly text, .plot-container text,
+[id*="graph"] svg text, .main-svg text{
+  fill:#eef2f7 !important; opacity:1 !important; stroke:none !important;}
+.gtitle{fill:#ffffff !important;}
+.legendtext{fill:#eef2f7 !important;}
+/* gridlines / axis lines */
+.gridlayer path, .xgrid, .ygrid{stroke:rgba(255,255,255,.10) !important;}
+.zerolinelayer path, .xlines-above, .ylines-above,
+.xaxislayer-above path, .yaxislayer-above path{stroke:rgba(255,255,255,.22) !important;}
+.main-svg{background:transparent !important;}
+.js-plotly-plot .bg, .plotly .bg{fill:transparent !important;}
+/* tone down the glaring white range-slider bar at the top of the chart */
+.rangeslider-bg{fill:#10151e !important;stroke:#222b39 !important;}
+.rangeslider-mask-min, .rangeslider-mask-max{fill:rgba(11,14,20,.72) !important;}
+.rangeslider-slidebox{fill:rgba(255,255,255,.05) !important;}
+.rangeslider-grabber-min rect, .rangeslider-grabber-max rect{fill:#2c3746 !important;}
+/* export / mode-bar icons top-right */
+.modebar-btn .icon path{fill:#8a97a8 !important;}
+.modebar-group{background:transparent !important;}
+
+/* ===== Landing (asymmetric, left-aligned, no glow, no gradient text) ===== */
+#ctf-landing{max-width:1180px;margin:0 auto;padding:40px 20px 30px;text-align:left;}
+#ctf-landing .ctf-eyebrow{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:.76rem;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--mut);border:1px solid var(--bd2);
+  padding:6px 12px;border-radius:6px;}
+#ctf-landing .ctf-title{font-family:'Outfit',sans-serif;font-weight:800;font-size:clamp(2.2rem,6vw,4rem);
+  line-height:.98;letter-spacing:-.035em;margin:22px 0 0;color:#fff;max-width:16ch;}
+#ctf-landing .ctf-title .accent{color:var(--accent);}
+#ctf-landing .ctf-tagline{font-size:1.1rem;line-height:1.6;color:var(--mut);max-width:60ch;margin:20px 0 26px;}
+#ctf-landing .ctf-cta{display:flex;gap:12px;flex-wrap:wrap;}
+#ctf-landing .ctf-cta a{font-weight:600;padding:11px 22px;border-radius:9px;}
+/* steps as a bordered list, not card boxes */
+#ctf-landing .ctf-steps{margin:56px 0 0;border-top:1px solid var(--bd);max-width:900px;}
+#ctf-landing .ctf-step{display:grid;grid-template-columns:64px 1fr;gap:20px;align-items:start;
+  padding:22px 4px;border-bottom:1px solid var(--bd);}
+#ctf-landing .ctf-step .n{font-family:'JetBrains Mono',monospace;font-size:1rem;color:var(--accent);padding-top:3px;}
+#ctf-landing .ctf-step h4{margin:0 0 5px;font-size:1.08rem;color:#fff;font-weight:600;letter-spacing:-.01em;}
+#ctf-landing .ctf-step p{margin:0;font-size:.95rem;color:var(--mut);max-width:62ch;}
+#ctf-landing .ctf-section-h{font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.14em;
+  font-size:.78rem;color:var(--mut);margin:52px 0 0;font-weight:500;}
+#ctf-landing .ctf-note{color:var(--mut);font-size:.9rem;border-left:2px solid var(--bd2);padding:2px 0 2px 16px;margin-top:34px;max-width:70ch;}
+@media (max-width:768px){
+  #ctf-landing{padding:24px 16px;}
+  #ctf-landing .ctf-step{grid-template-columns:1fr;gap:4px;}
+}
+</style>
+
+</head>
+<body>
+<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+  <div class="container">
+    <a href="/" class="navbar-brand">
+      
+        UCSI Agentic AI-Driven CTF 2026
+      
+    </a>
+
+    <button
+        class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#base-navbars"
+        aria-controls="base-navbars" aria-expanded="false" aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="base-navbars">
+      <ul class="navbar-nav me-auto">
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="/users">
+              Users
+            </a>
+          </li>
+
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/teams">
+                Teams
+              </a>
+            </li>
+          
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="/scoreboard">
+              Scoreboard
+            </a>
+          </li>
+        
+
+        <li class="nav-item">
+          <a class="nav-link" href="/challenges">
+            Challenges
+          </a>
+        </li>
+      </ul>
+
+      <hr class="d-sm-flex d-md-flex d-lg-none">
+
+      <ul class="navbar-nav ms-md-auto d-block d-sm-flex d-md-flex">
+        
+
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/register">
+                <span data-bs-toggle="tooltip" data-bs-placement="bottom" title="Register">
+                  <i class="fas fa-user-plus d-none d-md-inline d-lg-none"></i>
+                </span>
+                <span class="d-sm-inline d-md-none d-lg-inline">
+                  <i class="fas fa-user-plus pe-1"></i>
+                  Register
+                </span>
+              </a>
+            </li>
+          
+
+          <li class="nav-item">
+            <a class="nav-link" href="/login">
+              <span data-bs-toggle="tooltip" data-bs-placement="bottom" title="Login">
+                <i class="fas fa-sign-in-alt d-none d-md-inline d-lg-none"></i>
+              </span>
+              <span class="d-sm-inline d-md-none d-lg-inline">
+                <i class="fas fa-sign-in-alt pe-1"></i>
+                Login
+              </span>
+            </a>
+          </li>
+        
+
+        <li class="nav-item dropdown">
+          <button class="nav-link dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-language d-none d-md-inline"></i>
+            <span class="d-sm-inline d-md-none">
+              <i class="fas fa-language pe-1"></i>
+              Change language
+            </span>
+          </button>
+          <form x-data="LanguageForm">
+            <ul class="dropdown-menu dropdown-menu-end">
+              
+              <li>
+                  <span class="dropdown-item " @click="set" value="en">
+                    English
+                  </span>
+              </li>
+              <li>
+                  <span class="dropdown-item " @click="set" value="de">
+                    Deutsch
+                  </span>
+              </li>
+              <li>
+                  <span class="dropdown-item " @click="set" value="pl">
+                    Polski
+                  </span>
+              </li>
+              <li>
+                  <span class="dropdown-item " @click="set" value="es">
+                    Español
+                  </span>
+              </li>
+              <li>
+                  <span class="dropdown-item " @click="set" value="ar">
+                    اَلْعَرَبِيَّةُ
+                  </span>
+              </li>
+              <li>
+                  <span class="dropdown-item " @click="set" value="zh_CN">
+                    简体中文
+                  </span>
+              </li>
+              <li>
+                  <span class="dropdown-item " @click="set" value="zh_TW">
+                    繁體中文
+                  </span>
+              </li>
+              <li>
+                  <span class="dropdown-item " @click="set" value="fr">
+                    Français
+                  </span>
+              </li>
+              <li>
+                  <span class="dropdown-item " @click="set" value="ko">
+                    한국어
+                  </span>
+              </li>
+              <li>
+                  <span class="dropdown-item " @click="set" value="ru">
+                    русский язык
+                  </span>
+              </li>
+              <li>
+                  <span class="dropdown-item " @click="set" value="pt_BR">
+                    Português do Brasil
+                  </span>
+              </li>
+              <li>
+                  <span class="dropdown-item " @click="set" value="sk">
+                    Slovenský jazyk
+                  </span>
+              </li>
+              <li>
+                  <span class="dropdown-item " @click="set" value="ja">
+                    日本語
+                  </span>
+              </li>
+              <li>
+                  <span class="dropdown-item " @click="set" value="it">
+                    Italiano
+                  </span>
+              </li>
+              <li>
+                  <span class="dropdown-item " @click="set" value="vi">
+                    tiếng Việt
+                  </span>
+              </li>
+              <li>
+                  <span class="dropdown-item " @click="set" value="ca">
+                    Català
+                  </span>
+              </li>
+              <li>
+                  <span class="dropdown-item " @click="set" value="el">
+                    Ελληνικά
+                  </span>
+              </li>
+              <li>
+                  <span class="dropdown-item " @click="set" value="fi">
+                    Suomi
+                  </span>
+              </li>
+              <li>
+                  <span class="dropdown-item " @click="set" value="ro">
+                    Română
+                  </span>
+              </li>
+              <li>
+                  <span class="dropdown-item " @click="set" value="sl">
+                    Slovenščina
+                  </span>
+              </li>
+              <li>
+                  <span class="dropdown-item " @click="set" value="sv">
+                    Svenska
+                  </span>
+              </li>
+              <li>
+                  <span class="dropdown-item " @click="set" value="he">
+                    עברית
+                  </span>
+              </li>
+              <li>
+                  <span class="dropdown-item " @click="set" value="uz">
+                    oʻzbekcha
+                  </span>
+              </li>
+              <li>
+                  <span class="dropdown-item " @click="set" value="sr">
+                    Српски језик
+                  </span>
+              </li>
+              <li>
+                  <span class="dropdown-item " @click="set" value="no">
+                    Norsk
+                  </span>
+              </li>
+              <li>
+                  <span class="dropdown-item " @click="set" value="hr">
+                    Hrvatski
+                  </span>
+              </li>
+              <li>
+                  <span class="dropdown-item " @click="set" value="cs">
+                    Čeština
+                  </span>
+              </li>
+              <li>
+                  <span class="dropdown-item " @click="set" value="id">
+                    Bahasa Indonesia
+                  </span>
+              </li>
+            </ul>
+          </form>
+        </li>
+
+        <li class="nav-item">
+          <button class="nav-link theme-switch" type="button">
+            <span data-bs-toggle="tooltip" data-bs-placement="bottom" title="Toggle theme">
+              <i class="fas fa-sun d-none d-md-inline"></i>
+            </span>
+            <span class="d-sm-inline d-md-none">
+              <i class="fas fa-sun pe-1"></i>
+              Toggle theme
+            </span>
+          </button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<main role="main">
+  
+  <div class="jumbotron">
+    <div class="container">
+      <h1 id="team-id" data-ctfd-team-id="55">Team Mantiq</h1>
+
+      
+
+      
+
+      
+
+      
+
+      <div class="pt-2">
+        
+      </div>
+
+      <div class="pt-2">
+        
+      </div>
+
+      
+
+      <h2 id="team-place" class="text-center">
+        
+
+        
+        
+          
+            1st
+            <small>place</small>
+          
+        
+      </h2>
+
+      <h2 id="team-score" class="text-center">
+        
+          400
+          <small>points</small>
+        
+      </h2>
+    </div>
+  </div>
+
+  <div class="container">
+    <div>
+  
+
+  
+</div>
+
+    <br>
+
+    <div class="row">
+      <div class="col-md-12">
+        <h3>Members</h3>
+        <table class="table table-striped align-middle">
+          <thead>
+          <tr>
+            <th>User Name</th>
+            <th>Score</th>
+          </tr>
+          </thead>
+          <tbody>
+          
+            <tr>
+              <td>
+                <a href="/users/78">
+                  Jawad
+                </a>
+                
+                
+                  <span class="badge bg-primary ms-2">Captain</span>
+                
+              </td>
+              <td>100</td>
+            </tr>
+          
+            <tr>
+              <td>
+                <a href="/users/126">
+                  Rehan9
+                </a>
+                
+                
+              </td>
+              <td>100</td>
+            </tr>
+          
+            <tr>
+              <td>
+                <a href="/users/147">
+                  RyanCTFUCSI
+                </a>
+                
+                
+              </td>
+              <td>0</td>
+            </tr>
+          
+            <tr>
+              <td>
+                <a href="/users/165">
+                  Audric
+                </a>
+                
+                
+              </td>
+              <td>200</td>
+            </tr>
+          
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    
+      
+
+      <div class="row">
+        <div class="col-md-12">
+          <h3>Solves</h3>
+          <table class="table table-striped align-middle">
+            <thead>
+            <tr>
+              <th class="text-center">Challenge</th>
+              <th class="d-none d-md-block d-lg-block">Category</th>
+              <th>Value</th>
+              <th>Time</th>
+            </tr>
+            </thead>
+            <tbody>
+            
+              <tr>
+                <td class="text-center">
+                  <a href="/challenges#StaffDesk-13">
+                    StaffDesk
+                  </a>
+                </td>
+                <td class="d-none d-md-block d-lg-block">Web</td>
+                <td>100</td>
+                <td class="solve-time">
+                  <span data-time="2026-08-06T03:35:57.984036Z"></span>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="text-center">
+                  <a href="/challenges#Sandworm VM-7">
+                    Sandworm VM
+                  </a>
+                </td>
+                <td class="d-none d-md-block d-lg-block">Binary exploitation</td>
+                <td>100</td>
+                <td class="solve-time">
+                  <span data-time="2026-08-06T03:15:09.012784Z"></span>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="text-center">
+                  <a href="/challenges#Saturn Exchange-1">
+                    Saturn Exchange
+                  </a>
+                </td>
+                <td class="d-none d-md-block d-lg-block">Web</td>
+                <td>100</td>
+                <td class="solve-time">
+                  <span data-time="2026-08-06T02:57:26.244114Z"></span>
+                </td>
+              </tr>
+            
+              <tr>
+                <td class="text-center">
+                  <a href="/challenges#Grimoire Heap-6">
+                    Grimoire Heap
+                  </a>
+                </td>
+                <td class="d-none d-md-block d-lg-block">Binary exploitation</td>
+                <td>100</td>
+                <td class="solve-time">
+                  <span data-time="2026-08-06T02:45:36.777464Z"></span>
+                </td>
+              </tr>
+            
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="clearfix"></div>
+
+      <div class="row" x-data="TeamGraphs">
+        <div class="col-md-6 d-none d-md-block d-lg-block py-4">
+          <div class="progress">
+            <div
+              class="progress-bar"
+              role="progressbar"
+              :style="{ width: `${getSolvePercentage()}%`, 'background-color': 'rgb(0, 209, 64)' }"
+            >
+            </div>
+            <div
+              class="progress-bar"
+              role="progressbar"
+              :style="{ width: `${getFailPercentage()}%`, 'background-color': 'rgb(207, 38, 0)' }"
+            >
+            </div>
+          </div>
+          <div class="ps-2 float-start">
+            <svg height="16" width="16">
+              <circle cx="8" cy="8" r="5" fill="rgb(0, 209, 64)" />
+            </svg>
+            <small x-text="`Solves (${getSolvePercentage()}%)`"></small>
+          </div>
+          <div class="ps-2 float-start">
+            <svg height="16" width="16">
+              <circle cx="8" cy="8" r="5" fill="rgb(207, 38, 0)" />
+            </svg>
+            <small x-text="`Fails (${getFailPercentage()}%)`"></small>
+          </div>
+        </div>
+        <div class="col-md-6 d-none d-md-block d-lg-block py-4">
+          <div class="progress">
+            <template x-for="category in getCategoryBreakdown()" :key="category.name">
+              <div
+                class="progress-bar"
+                role="progressbar"
+                :style="{ width: `${category.percent}%`, 'background-color': category.color }"
+              >
+              </div>
+            </template>
+          </div>
+          <template x-for="category in getCategoryBreakdown()" :key="category.name">
+            <div class="ps-2 float-start">
+              <svg height="16" width="16">
+                <circle cx="8" cy="8" r="5" :fill="category.color" />
+              </svg>
+              <small x-text="`${category.name} (${category.percent}%)`"></small>
+            </div>
+          </template>
+        </div>
+
+        <br class="clearfix">
+
+        <div class="col-md-12 d-none d-md-block d-lg-block">
+          <div id="score-graph" x-ref="scoregraph" class="w-100 d-flex align-items-center">
+            <div class="text-center w-100">
+              <i class="fas fa-circle-notch fa-spin fa-3x fa-fw spinner"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+  </div>
+
+</main>
+
+
+
+<footer class="footer">
+  <div class="container text-center">
+    <a href="https://ctfd.io" class="text-secondary">
+      <small class="text-muted">
+        Powered by CTFd
+      </small>
+    </a>
+  </div>
+</footer>
+
+<div x-data>
+  <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div x-ref="toast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+      <div class="toast-header">
+        <strong class="me-auto" x-text="$store.toast.title"></strong>
+        <small>just now</small>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body" x-html="$store.toast.html">
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div x-data>
+  <div class="modal fade" x-ref="modal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" x-text="$store.modal.title"></h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p x-html="$store.modal.html"></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Got it!</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+  <script>
+      window.TEAM =
+      {"account_id": 55, "id": 55, "name": "Team Mantiq", "type": "team"}
+  </script>
+
+  <script type="module"  src="/themes/core/static/assets/index.94b01c79.js"></script><script type="module"  src="/themes/core/static/assets/userscore.8adb2b33.js"></script><script type="module"  src="/themes/core/static/assets/index.1cf73b05.js"></script><script type="module"  src="/themes/core/static/assets/echarts.128204f2.js"></script><script type="module"  src="/themes/core/static/assets/teams_public.1f007619.js"></script>
+
+
+
+
+<div style="text-align:center;padding:20px 12px;margin-top:34px;border-top:1px solid #232c3b;
+  color:#6b7a8d;font-family:'Inter',system-ui,sans-serif;font-size:.85rem;">
+  <span style="font-family:'Orbitron',sans-serif;letter-spacing:1px;color:#c7d2df;">UCSI AGENTIC AI-DRIVEN CTF 2026</span>
+  &nbsp;&middot;&nbsp; <span style="color:#E4002B;">Outsmart the agents. Capture the flags.</span>
+</div>
+
+</body>
+</html>

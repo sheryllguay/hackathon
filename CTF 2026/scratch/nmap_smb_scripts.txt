@@ -1,0 +1,23 @@
+Starting Nmap 7.80 ( https://nmap.org ) at 2026-08-05 18:10 Malay Peninsula Standard Time
+Nmap scan report for 10.181.33.90
+Host is up (0.0010s latency).
+
+PORT    STATE SERVICE
+445/tcp open  microsoft-ds
+
+Host script results:
+| smb-protocols: 
+|   dialects: 
+|     2.02
+|     2.10
+|     3.00
+|     3.02
+|_    3.11
+| smb2-security-mode: 
+|   2.02: 
+|_    Message signing enabled and required
+| smb2-time: 
+|   date: 2026-08-05T10:10:37
+|_  start_date: N/A
+
+Nmap done: 1 IP address (1 host up) scanned in 10.60 seconds

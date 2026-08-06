@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pony Express Dispatch</title>
+  <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      background: #10130f; color: #d9d3c4;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .card {
+      width: min(600px, 92vw);
+      background: #181b15; border: 1px solid #2c2f26; border-radius: 12px;
+      padding: 28px 30px; box-shadow: 0 12px 40px rgba(0,0,0,.45);
+    }
+    h1 { margin: 0 0 4px; font-size: 22px; color: #f0e9d8; }
+    .tagline { margin: 0 0 20px; color: #a49b85; font-size: 13px; }
+    label { display: block; margin: 14px 0 6px; font-size: 12px; color: #c2b89e; }
+    textarea, input {
+      width: 100%; padding: 9px 10px; color: #ece4cf; background: #0e110c;
+      border: 1px solid #33362b; border-radius: 6px; font: inherit; font-size: 13px;
+    }
+    textarea { min-height: 120px; resize: vertical; }
+    button {
+      margin-top: 18px; width: 100%; padding: 10px; border: 0; border-radius: 6px;
+      background: #5a4a2a; color: #f0e9d8; font: inherit; font-size: 14px; cursor: pointer;
+    }
+    button:hover { background: #6d5a35; }
+    .out {
+      margin-top: 16px; padding: 12px; border-radius: 6px; background: #0e110c;
+      border: 1px dashed #33362b; white-space: pre-wrap; word-break: break-all;
+      font-size: 12px; color: #cfe8b8; display: none;
+    }
+    .stock { margin-top: 18px; font-size: 12px; color: #a49b85; }
+    .stock a { color: #b39b6a; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Pony Express Dispatch Office</h1>
+    <p class="tagline">the mail must get through - templates rendered fresh, every time</p>
+
+    <form id="f">
+      <label for="template">message template</label>
+      <textarea id="template" placeholder="Welcome aboard, {{name}}! Your route is {{route}}."></textarea>
+
+      <label for="ctx">context (JSON, optional)</label>
+      <input id="ctx" value='{"name":"rider","route":"east"}' autocomplete="off">
+
+      <button type="submit">preview dispatch</button>
+    </form>
+
+    <div id="out" class="out"></div>
+
+    <div class="stock">
+      stock templates:
+      <a href="#" data-t="welcome.txt">welcome.txt</a>
+      <a href="#" data-t="dispatch.txt">dispatch.txt</a>
+      <a href="#" data-t="invoice.txt">invoice.txt</a>
+    </div>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    async function preview(template, ctx) {
+      const r = await fetch('/api/templates/preview', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ template, context: ctx }),
+      });
+      const t = await r.text();
+      const out = $('out');
+      out.style.display = 'block';
+      out.textContent = (r.ok ? '' : `[${r.status}] `) + t;
+    }
+
+    $('f').addEventListener('submit', (e) => {
+      e.preventDefault();
+      let ctx = {};
+      try { ctx = JSON.parse($('ctx').value || '{}'); } catch (_) { ctx = {}; }
+      preview($('template').value, ctx);
+    });
+
+    document.querySelectorAll('.stock a').forEach((a) => {
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        $('template').value = '';
+        fetch('/api/templates/' + a.dataset.t).then((r) => r.text()).then((t) => {
+          const out = $('out');
+          out.style.display = 'block';
+          out.textContent = t;
+        });
+      });
+    });
+  </script>
+</body>
+</html>

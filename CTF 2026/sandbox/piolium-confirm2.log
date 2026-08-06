@@ -1,0 +1,15 @@
+Your command is garbled and I can't tell what you intended. A few issues:
+
+1. **No such binary**: There is no `piolium-confirm` executable. The `@vigolium/piolium` package only installs a `piolium` binary (at `…\@vigolium\piolium\bin\piolium.mjs`). Its real subcommands are `doctor`, `auth`, `reset-auth`, `login`, or it passes everything else through to `pi`.
+
+2. **`C:\Program Files\Git\…` is wrong**: Git's install dir doesn't host any piolium binary. The path is unrelated.
+
+3. **URL is mangled**: `http;\localhost;4443` is not a valid URL. A target URL would be `http://localhost:4443`.
+
+4. **`. --fresh`**: piolium doesn't take a `.` positional or a `--fresh` flag — it expects a directory target only when running an audit skill through pi itself.
+
+What are you actually trying to do? Some likely possibilities:
+
+- **Run a piolium audit against this directory** → `piolium .` (or just ask me to run an audit skill here).
+- **Open a local web UI / confirm a server on `http://localhost:4443`** → that's a separate concern; tell me what server it is.
+- **Something else entirely** → describe the goal and I'll pick the right command.

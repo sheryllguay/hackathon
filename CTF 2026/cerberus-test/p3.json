@@ -1,0 +1,1 @@
+{"enrichment":["java.util.List<com.ucsi.cerberus.enrich.EnrichmentTask>",[{"command":["id"]},{"command":["uname","-a"]}]]}

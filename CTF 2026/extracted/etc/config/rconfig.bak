@@ -1,0 +1,6 @@
+# Automatic backup taken 2026-07-31 11:47:12 by uhttpd
+config backup 'secrets'
+	option description 'pre-RMA snapshot'
+	option ssid 'OldStock-F9D2'
+	option flag 'UCSI26{0ld5t0ck_fw_b4ckup_l34k}'
+	option psk 'not-the-flag'

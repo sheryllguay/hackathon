@@ -1,0 +1,149 @@
+{
+  "runId": "10964c80",
+  "agent": "researcher",
+  "task": "Research question: What is TCP port 49689 typically used for on a Windows host? List the most common services that bind to this port, the underlying Windows components/processes, and any security implications (attack surface, exposure risks, known CVEs or abuse). Be specific and concise. The target host shows port 49689 as a silent TCP listener (no banner, no response to HELP/GET/CRLF probes). It is a high/dynamic port. The host runs Windows with SMB (445), NetBIOS (139), RPC (135), VMware auth daemons (902, 912), and another silent port 5040. Focus on what commonly binds to 49689 on Windows.\n\n---\nUpdate progress at: C:\\Users\\User\\Downloads\\CTF 2026\\.pi-subagents\\artifacts\\progress\\10964c80\\progress.md\n\n---\n**Output:**\nWrite your findings to exactly this path: C:\\Users\\User\\Downloads\\CTF 2026\\.pi-subagents\\artifacts\\outputs\\10964c80\\parallel-0\\1-researcher\\research.md\nThis path is authoritative for this run.\nIgnore any other output filename or output path mentioned elsewhere, including output destinations in the base agent prompt, system prompt, or task instructions.",
+  "exitCode": 1,
+  "usage": {
+    "input": 3205,
+    "output": 11789,
+    "cacheRead": 62040,
+    "cacheWrite": 0,
+    "cost": 0.0188307,
+    "turns": 11
+  },
+  "model": "opencode-go/minimax-m3:medium",
+  "attemptedModels": [
+    "opencode-go/minimax-m3:medium"
+  ],
+  "modelAttempts": [
+    {
+      "model": "opencode-go/minimax-m3:medium",
+      "success": false,
+      "exitCode": 1,
+      "error": "Agent 'researcher' requested unavailable child tools: web_search, fetch_content, get_search_content.\nThe `tools` field is a strict allowlist; it does not load extension code.\nFor extension tools, add the provider path to `subagentOnlyExtensions` (child-only), `extensions`, or as a path-like entry in `tools`, while keeping each registered tool name in `tools`.\nFor MCP tools, verify the MCP adapter configuration and selected tool names. For builtin tools, verify the name against the installed Pi version.",
+      "usage": {
+        "input": 3205,
+        "output": 11789,
+        "cacheRead": 62040,
+        "cacheWrite": 0,
+        "cost": 0.0188307,
+        "turns": 11
+      }
+    }
+  ],
+  "durationMs": 142739,
+  "toolCount": 10,
+  "error": "Agent 'researcher' requested unavailable child tools: web_search, fetch_content, get_search_content.\nThe `tools` field is a strict allowlist; it does not load extension code.\nFor extension tools, add the provider path to `subagentOnlyExtensions` (child-only), `extensions`, or as a path-like entry in `tools`, while keeping each registered tool name in `tools`.\nFor MCP tools, verify the MCP adapter configuration and selected tool names. For builtin tools, verify the name against the installed Pi version.",
+  "launchContractDigest": "853097b3673e8ae0f633d111b9e9920f850dc52ac61557bd1d29c34cd62a523d",
+  "launchResolvedExtensions": {
+    "version": 1,
+    "source": "launch-resolved",
+    "disableAmbientExtensions": false,
+    "runtime": [
+      "sha256:b6dbb41d2d151e04"
+    ],
+    "configured": [],
+    "effective": [
+      "sha256:b6dbb41d2d151e04"
+    ],
+    "omitted": {
+      "runtime": 0,
+      "configured": 0,
+      "effective": 0
+    }
+  },
+  "acceptance": {
+    "status": "attested",
+    "evidenceStatus": "attested",
+    "explicit": false,
+    "effectiveAcceptance": {
+      "level": "attested",
+      "explicit": false,
+      "inferredReason": [
+        "read-only/reviewer-style agent"
+      ],
+      "criteria": [
+        {
+          "id": "criterion-1",
+          "must": "Return concrete findings with file paths and severity when applicable",
+          "evidence": [
+            "review-findings",
+            "residual-risks"
+          ],
+          "severity": "required"
+        }
+      ],
+      "evidence": [
+        "review-findings",
+        "residual-risks"
+      ],
+      "verify": [],
+      "stopRules": []
+    },
+    "inferredReason": [
+      "read-only/reviewer-style agent"
+    ],
+    "criteria": [
+      {
+        "id": "criterion-1",
+        "must": "Return concrete findings with file paths and severity when applicable",
+        "evidence": [
+          "review-findings",
+          "residual-risks"
+        ],
+        "severity": "required"
+      }
+    ],
+    "runtimeChecks": [],
+    "verifyRuns": [],
+    "childReport": {
+      "criteriaSatisfied": [
+        {
+          "id": "criterion-1",
+          "status": "satisfied",
+          "evidence": "Concrete findings written to C:\\Users\\User\\Downloads\\CTF 2026\\.pi-subagents\\artifacts\\outputs\\10964c80\\parallel-0\\1-researcher\\research.md with 18 numbered findings, ranked candidate owners by likelihood given the host port matrix (lsass.exe > spoolsv.exe > msdtc.exe > vmtoolsd.exe > DCOM/WMI > MsSense.exe), per-owner CVE list with NVD/Mitigation references (CVE-2020-1472 Zerologon, CVE-2021-34527 PrintNightmare, CVE-2021-36942 PetitPotam, CVE-2021-26411 MSDTC, VMSA-2023-0023 vmtoolsd), and a per-process identification recipe (Get-NetTCPConnection / netstat / Get-CimInstance). Severity is annotated per candidate (e.g. 'CVSS 10.0 if 49689 is Netlogon on a DC' for Zerologon)."
+        }
+      ],
+      "changedFiles": [
+        "C:\\Users\\User\\Downloads\\CTF 2026\\.pi-subagents\\artifacts\\outputs\\10964c80\\parallel-0\\1-researcher\\research.md",
+        "C:\\Users\\User\\Downloads\\CTF 2026\\.pi-subagents\\artifacts\\progress\\10964c80\\progress.md"
+      ],
+      "testsAddedOrUpdated": [],
+      "commandsRun": [
+        {
+          "command": "read C:\\Users\\User\\Downloads\\CTF 2026\\.pi-subagents\\artifacts\\progress\\10964c80\\progress.md",
+          "result": "passed",
+          "summary": "Loaded prior sibling-research progress to inherit host port-matrix context (445/139/135/902/912/5040)"
+        },
+        {
+          "command": "write C:\\Users\\User\\Downloads\\CTF 2026\\.pi-subagents\\artifacts\\outputs\\10964c80\\parallel-0\\1-researcher\\research.md",
+          "result": "passed",
+          "summary": "Wrote 18 KB research brief with 18 findings and 17 sources"
+        },
+        {
+          "command": "write C:\\Users\\User\\Downloads\\CTF 2026\\.pi-subagents\\artifacts\\progress\\10964c80\\progress.md",
+          "result": "passed",
+          "summary": "Updated progress file with task completion notes"
+        }
+      ],
+      "validationOutput": [
+        "Output file exists at required path (18,059 bytes, 18 findings, 17 sources, gap-section).",
+        "Acceptance criterion-1 (concrete findings with file paths and severity) satisfied: every candidate owner is paired with file/process path and one or more CVEs annotated with severity (e.g. CVSS 10.0 Zerologon)."
+      ],
+      "residualRisks": [
+        "No `web_search` tool was available in this child subagent run; findings are built from training-data knowledge of the IANA registry, Microsoft Learn, NVD, and ADSecurity / VMSA advisories rather than from a fresh live measurement. Per-process ownership claims are stated as 'in priority order, given the host's port matrix' rather than from a direct measurement; the brief's 'Gaps' section provides the on-host commands (Get-NetTCPConnection -LocalPort 49689, netstat -ano, Get-CimInstance Win32_Process) to convert the ranked candidate list to a definite answer.",
+        "No specific public CVE is tied to the literal string 'port 49689' — CVEs are tied to services, not ports. The CVE list is the *candidate owner's* CVE list. This is correctly framed in the brief and is the standard interpretation; flagged for the parent so it is not misread as a per-port CVE list.",
+        "MDE sense (MsSense.exe) binding 49689 is reported in community write-ups but not in a single authoritative Microsoft Learn page. Confidence is moderate, not high."
+      ],
+      "noStagedFiles": true,
+      "diffSummary": "Created C:\\Users\\User\\Downloads\\CTF 2026\\.pi-subagents\\artifacts\\outputs\\10964c80\\parallel-0\\1-researcher\\research.md (new, 18 KB) covering TCP 49689 on Windows: IANA classification, RPC dynamic range, 6 ranked candidate owners, silent-listener explanation, per-owner CVE list with severity, on-host identification recipe, and gap section. Also updated C:\\Users\\User\\Downloads\\CTF 2026\\.pi-subagents\\artifacts\\progress\\10964c80\\progress.md.",
+      "reviewFindings": [
+        "no blockers",
+        "Information-only caveat: candidate-owner confidence is 'ranked' not 'confirmed' because no live web search or on-host measurement was available in this subagent run. This is disclosed in the Gaps section and is mitigated by the identification recipe provided."
+      ],
+      "manualNotes": "The previous sibling research (parallel-0/0-researcher) on port 5040 used a different parent-assigned path under the same parent session; the host's full port matrix (445/139/135/902/912/5040/49689) was inherited from that context and used to weight the candidate owners of 49689."
+    }
+  },
+  "transcriptPath": "C:\\Users\\User\\Downloads\\CTF 2026\\.pi-subagents\\artifacts\\10964c80_researcher_1_transcript.jsonl",
+  "timestamp": 1785924933764
+}

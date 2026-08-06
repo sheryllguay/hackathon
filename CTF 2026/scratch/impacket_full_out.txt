@@ -1,0 +1,19 @@
+--- Impacket low-level NTLMSSP challenge probe ---
+  Dialect: 0x311
+  Setting dialect to 0x0302
+  Sending session setup (NTLMSSP_NEGOTIATE)...
+  Got response, valid? True
+  Status: 0xc0000016
+  Flags: 0x00000001
+  SessionID: 0x0001200004000079
+  SessionFlags: 0x0000
+  Buffer (229 bytes): a181e23081dfa0030a0101a10c060a2b06010401823702020aa281c90481c64e544c4d5353500002000000160016003800000035828ae2dc23583311473ac60000000000000000780078004e0000000a00f4650000000f530048004500520059004c004c00470055004100590002001600530048004500520059004c004c00470055004100590001001600530048004500520059004c004c00470055004100590004001600730068006500720079006c006c00670075006100790003001600730068006500720079006c006c0067007500610079000700080087a959d2c424dd0100000000
+  NTLMSSP Challenge fields: ['ENCODING', 'NULL_NULL_TERMINATOR_REGEX', '__class__', '__delattr__', '__delitem__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getitem__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__len__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__setitem__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', 'alignment', 'b', 'calcPackFieldSize', 'calcPackSize', 'calcUnpackSize', 'checkVersion', 'clear', 'commonHdr', 'data', 'debug', 'dump', 'fields', 'findAddressFieldFor', 'findLengthFieldFor', 'formatForField', 'fromFile', 'fromString', 'getData', 'pack', 'packField', 'rawData', 'setAlignment', 'setData', 'structure', 'unpack', 'zeroValue']
+Traceback (most recent call last):
+  File "C:\Users\User\Downloads\CTF 2026\scratch\impacket_full.py", line 68, in <module>
+    print(f"  MessageType: {ntlmChallenge['MessageType']}")
+                            ~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "C:\Users\User\Downloads\Python\Lib\site-packages\impacket\structure.py", line 186, in __getitem__
+    return self.fields[key]
+           ~~~~~~~~~~~^^^^^
+KeyError: 'MessageType'

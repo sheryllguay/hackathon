@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Withdraw · Saturn Exchange</title>
+  <link rel="stylesheet" href="/pico.min.css" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="container">
+    <nav>
+      <ul><li><strong>Saturn Exchange</strong></li></ul>
+      <ul>
+        <li>Balance: <strong id="balance">1.0000</strong> BTC</li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="container">
+    <div class="grid">
+      <article>
+        <hgroup>
+          <h2>Withdraw BTC</h2>
+          <p>Funds are queued and cleared in the next settlement batch.</p>
+        </hgroup>
+        <label>Amount (BTC)
+          <input type="number" id="withdraw-amount" step="0.0001" min="0.0001" placeholder="0.0000" />
+        </label>
+        <button id="withdraw-btn">Withdraw</button>
+        <button id="reset-btn" class="secondary outline">Reset account</button>
+        <p id="result" hidden></p>
+      </article>
+
+      <article>
+        <header><strong>Activity</strong></header>
+        <div id="log"><small>No transactions yet</small></div>
+      </article>
+    </div>
+  </main>
+
+  <script src="/client.js"></script>
+</body>
+</html>

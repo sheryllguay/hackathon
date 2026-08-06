@@ -1,0 +1,57 @@
+The audit is complete. Here's the summary:
+
+## xVulnv2 Balanced Security Audit — Complete
+
+**Profile:** `piolium-balanced`  
+**Target:** `xVulnv2 — The Local Plate` (Go 1.21, SQLite)  
+**Method:** Manual code review of all 30 source files (no SAST tooling or Go toolchain available in environment)
+
+### Results: 26 findings promoted · 1 Low dropped
+
+| Severity | Count | IDs |
+|---|---|---|
+| **Critical** | 8 | C1, C2, C3, C4, C5, C6, C7, C8 |
+| **High** | 14 | H1–H14 |
+| **Medium** | 4 | M1, M2, M3, M4 |
+| **Low** | 1 (dropped per methodology) | F-A7 (stale build artifacts) |
+
+### Coverage of documented ground truth
+
+All 20 findings in `vulns.json` (V01–V20) were independently re-verified via cold review. V14 was reclassified from **CWE-502** (Deserialization of Untrusted Data) to **CWE-602** (Client-Side Enforcement) — Go's `json.Unmarshal` is type-safe and cannot trigger code execution; the real issue is server trust of client-supplied cart state.
+
+### Additional findings not in ground truth (7)
+
+- **C8** Plaintext password storage (root cause of H5)
+- **H12** No brute-force protection on `/login`
+- **H13** CORS echo + credentials (amplifier for every authz bug)
+- **H14** TOCTOU race in `PlaceOrder` (175ms explicit sleep)
+- **M3** Session cookie `Secure: false`
+- **M4** Missing security headers (CSP, nosniff, X-Frame-Options)
+- F-A7 (dropped) Stale build artifacts in repo
+
+### Most impactful chains
+
+1. **C4 + C3** → unauthenticated admin in 2 HTTP requests (`/api/debug/info` leaks the bypass token)
+2. **C8 + H5 + H4** → full credential disclosure for any user from any session
+3. **H13** → every authz bug becomes a cross-origin browser exploit reachable from one malicious page load
+4. **C7** → JWT `alg=none` bypass yields staff/admin in 1 request
+
+### Retained audit artifacts (`piolium/`)
+
+```
+piolium/
+├── attack-surface/
+│   ├── knowledge-base-report.md   (35 KB — phases 1-10, 11 sections)
+│   └── sbom.json                  (8.6 KB — component inventory + trust boundaries)
+├── final-audit-report.md          (20.6 KB — executive summary, methodology, all 26 findings)
+└── findings/                      (26 per-finding reports)
+    ├── C1-v01-sqli-menu-item/report.md
+    ├── C2-v02-sqli-search/report.md
+    ├── ... (8 Critical)
+    ├── H1-v03-stored-xss-reviews/report.md
+    ├── ... (14 High)
+    ├── M1-v12-csrf-orders/report.md
+    └── ... (4 Medium)
+```
+
+All working artifacts (`findings-draft/`, `chamber-workspace/`, `codeql-queries/`, etc.) cleaned up per the audit methodology. Consistency checks pass: every ID in the final report maps to a directory, no Low-severity leakage, no stale separate reports.

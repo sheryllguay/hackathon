@@ -1,0 +1,8 @@
+Piolium standalone
+  home:       C:\Users\User\.piolium
+  package:    ok C:\Users\User\.pi\agent\npm\node_modules\@vigolium\piolium
+  agent:      C:\Users\User\.piolium\agent
+  sessions:   C:\Users\User\.piolium\agent\session
+  settings:   ok C:\Users\User\.piolium\agent\settings.json
+  auth:       configured C:\Users\User\.piolium\agent\auth.json
+  pi:         /c/Users/User/AppData/Roaming/npm/pi
