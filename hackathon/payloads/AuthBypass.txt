@@ -24,3 +24,12 @@ for otp in range(1000, 10000):
 admin:admin
 admin:password
 admin:admin123
+
+## IDOR - Hash-Obfuscated Object Reference (e.g. md5(str(id)) in profile URL)
+# 1. Log in (check HTML comment for guest creds) and read YOUR id from the profile page.
+# 2. Confirm scheme: md5("3000") == your profile token -> URL = /profile/user/<md5(id)>
+# 3. Enumerate nearby/small IDs; 200 + admin content = win, 404 = no such user.
+# See scripts/idor_enumerate.py for a reusable range walker.
+MD5_IDS = [hashlib.md5(str(i).encode()).hexdigest() for i in range(1, 31)]
+# Candidates when a "~20 employees" hint exists: 1..25; otherwise walk both sides of your own id.
+

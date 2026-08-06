@@ -29,6 +29,13 @@ It should capture repeatable workflows and investigation sequences, not challeng
 - When 2FA/OTP is present, check if the code is stored in the session cookie or brute-forceable (no rate limit).
 - Verify auth state server-side; a flag gated by `session['username'] == 'admin'` is trivially reachable once auth is bypassed.
 
+### IDOR (Hash-Obfuscated Object Reference)
+- When a profile/object URL uses an opaque token, check it against common one-way functions: `md5("your_leaked_id")` matching the URL confirms the scheme. No cracking needed — it is an encoding, not a secret.
+- Your OWN profile page usually leaks your numeric/role ID (e.g. "Guest (ID: 3000)") — the seed for cracking the whole scheme.
+- Enumerate small integer ranges (1..25 or both sides of your own ID). "About N users/employees" hints bound the space.
+- Distinguish 404 (no such id) from 200 (valid object) to walk the space; 200 + "admin"/role content = flag.
+- Obscurity/"not directly exposed" wording in the description => IDOR on a hashed or hidden reference.
+
 ### Load Balancer / Failover Bypass
 - Identify the load balancer and map which backend serves each response (content/headers/timing).
 - Read the provided LB config for `backup` servers, `check fall N`, `inter Ns`, and health-check paths.
@@ -100,6 +107,17 @@ It should capture repeatable workflows and investigation sequences, not challeng
 - Check for helper options such as --help or usage output.
 - Look for embedded strings, format strings, or obvious weaknesses.
 - Test the program with minimal inputs before developing a full exploit.
+
+### PIE Bypass via Format String Leak + Function Pointer Jump (ret2win)
+- If the program echoes your input via `printf(buffer)` AND lets you supply an arbitrary address
+  to call (`scanf("%lx")` -> `((void(*)())val)()`), it is a leak-then-jump two-stage pwn.
+- Leak a code pointer first: `%p %p ...` to dump; positional `%N$p` to read one slot precisely
+  (PIE TIME 2: `%19$p` -> `main+0x41`). A SIGSEGV handler printing "Segfault Occurred" only means
+  the address you jumped to was wrong - retry with the corrected win address.
+- Derive the target: `nm vuln | grep -wE "main|win"` gives stable compile-time offsets; the base
+  is random per run. `win = leak - leak_slot_off - (main_off - win_off)`.
+- One connection: leak in stage 1, jump in stage 2. See `skills/pwn/PIEBypass.md`,
+  `scripts/pwn_pie_leak.py`, `payloads/FormatString.txt`.
 
 ## Reverse Engineering
 ### Static Inspection
