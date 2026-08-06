@@ -1,0 +1,8 @@
+--- TCP connect + banner grab 10.181.33.90:445 ---
+  no pre-send banner (silent connect)
+
+--- SMB1 Negotiate on 10.181.33.90:445 ---
+  ERR: [WinError 10054] An existing connection was forcibly closed by the remote host
+
+--- SMB2 Negotiate on 10.181.33.90:445 ---
+  ERR: [WinError 10054] An existing connection was forcibly closed by the remote host

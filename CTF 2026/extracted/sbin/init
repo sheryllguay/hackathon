@@ -1,0 +1,3 @@
+#!/bin/ash
+# OldStock init - boot the box, bring up lan
+sleep 1

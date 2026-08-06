@@ -1,0 +1,29 @@
+--- SMB2 negotiate 3.1.1 only, sec_mode=0x01 ---
+  Got 76 bytes
+  hex: 00 00 00 48 fe 53 4d 42 40 00 00 00 0d 00 00 c0 00 00 01 00 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 09 00 00 00 00 00 00 00
+  SMB2 status=0xc000000d cmd=0x0000
+
+--- SMB2 negotiate 3.1.1 only, sec_mode=0x02 ---
+  Got 76 bytes
+  hex: 00 00 00 48 fe 53 4d 42 40 00 00 00 0d 00 00 c0 00 00 01 00 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 09 00 00 00 00 00 00 00
+  SMB2 status=0xc000000d cmd=0x0000
+
+--- SMB2 negotiate 3.0.2 only ---
+  Got 174 bytes
+  hex: 00 00 00 aa fe 53 4d 42 40 00 00 00 00 00 00 00 00 00 01 00 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 41 00 03 00 02 03 00 00 c0 61 13 e1 bd 92 49 46 b1 38 dd 87 da 17 a2 b8 07 00 00 00 00 00 80 00 00 00 80 00 00 00 80 00 45 d9 d1 84 c2 24 dd 01 00 00 00 00 00 00 00 00 80 00 2a 00 00 00 00 00 60 28 06 06 2b 06 01 05 05 02 a0 1e 30 1c a0 1a 30 18 06 0a 2b 06 01 04 01 82 37 02 02 1e 06 0a 2b 06 01 04 01 82 37 02 02 0a
+  SMB2 status=0x00000000 cmd=0x0000
+  NEGOTIATE: sec_mode=0x0003, dialect=0x0302 (SMB 3.0.2)
+  server_name=''
+
+--- SMB2 negotiate 3.0 only ---
+  ERR: timed out
+
+--- SMB2 negotiate 2.1 only ---
+  ERR: timed out
+
+--- SMB2 negotiate 2.0.2 only ---
+  ERR: timed out
+
+--- SMB1 negotiate ---
+  ERR: [WinError 10054] An existing connection was forcibly closed by the remote host
+

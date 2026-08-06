@@ -1,0 +1,20 @@
+--- TLS probe with version 0x0300 ---
+  Sending 50 bytes record: 16 03 00 00 2d 01 00 00 29 03 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  ERR: [WinError 10053] An established connection was aborted by the software in your host machine
+--- TLS probe with version 0x0301 ---
+  Sending 50 bytes record: 16 03 01 00 2d 01 00 00 29 03 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  ERR: [WinError 10053] An established connection was aborted by the software in your host machine
+--- TLS probe with version 0x0302 ---
+  Sending 50 bytes record: 16 03 02 00 2d 01 00 00 29 03 02 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  Got 137 bytes: 32 32 30 20 56 4d 77 61 72 65 20 41 75 74 68 65 6e 74 69 63 61 74 69 6f 6e 20 44 61 65 6d 6f 6e 20 56 65 72 73 69 6f 6e 20 31 2e 31 30 3a 20 53 53 4c 20 52 65 71 75 69 72 65 64 2c 20 53 65 72 76 65 72 44 61 65 6d 6f 6e 50 72 6f 74 6f 63 6f 6c 3a 53 4f 41 50 2c 20 4d 4b 53 44 69 73 70 6c 61 79 50 72 6f 74 6f 63 6f 6c 3a 56 4e 43 20 2c 20 2c 20 4e 46 43 53 53 4c 20 73 75 70 70 6f 72 74 65 64 2f 74 2c 20 0d 0a
+  Record: type=0x32 version=0x3230 length=8278
+--- TLS probe with version 0x0303 ---
+  Sending 50 bytes record: 16 03 03 00 2d 01 00 00 29 03 03 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  ERR: [WinError 10053] An established connection was aborted by the software in your host machine
+--- TLS probe with version 0x0304 ---
+  Sending 50 bytes record: 16 03 04 00 2d 01 00 00 29 03 04 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  Got 137 bytes: 32 32 30 20 56 4d 77 61 72 65 20 41 75 74 68 65 6e 74 69 63 61 74 69 6f 6e 20 44 61 65 6d 6f 6e 20 56 65 72 73 69 6f 6e 20 31 2e 31 30 3a 20 53 53 4c 20 52 65 71 75 69 72 65 64 2c 20 53 65 72 76 65 72 44 61 65 6d 6f 6e 50 72 6f 74 6f 63 6f 6c 3a 53 4f 41 50 2c 20 4d 4b 53 44 69 73 70 6c 61 79 50 72 6f 74 6f 63 6f 6c 3a 56 4e 43 20 2c 20 2c 20 4e 46 43 53 53 4c 20 73 75 70 70 6f 72 74 65 64 2f 74 2c 20 0d 0a
+  Record: type=0x32 version=0x3230 length=8278
+
+--- TCP banner on 902 ---
+  137 bytes: b'220 VMware Authentication Daemon Version 1.10: SSL Required, ServerDaemonProtocol:SOAP, MKSDisplayProtocol:VNC , , NFCSSL supported/t, \r\n'

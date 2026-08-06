@@ -1,0 +1,4 @@
+config system
+	option hostname OldStock
+	option ttylogin 0
+	option timezone UTC

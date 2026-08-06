@@ -1,0 +1,235 @@
+{
+  "sbom_format": "xVuln-balanced-audit-v1",
+  "generated_at": "2026-04-08T00:00:00Z",
+  "target": "xVulnv2 (The Local Plate) Restaurant Web App",
+  "language": "Go 1.21",
+  "build": {
+    "module": "xvulnv2",
+    "go_version": "1.21",
+    "cgo_required": true,
+    "entry_points": [
+      "main.go (HTTP backend on :4443, HTTP frontend on :4444)",
+      "cmd/xvulnctl/main.go (CLI for reset/scan/report)"
+    ]
+  },
+  "components": {
+    "runtime_dependencies": [
+      {
+        "name": "github.com/dgrijalva/jwt-go",
+        "version": "v3.2.0+incompatible",
+        "type": "library",
+        "category": "auth",
+        "supply_chain_risk": "HIGH",
+        "notes": "Archived upstream (replaced by github.com/golang-jwt/jwt). Repo intentionally retains this for dependency-scanner visibility."
+      },
+      {
+        "name": "github.com/gorilla/mux",
+        "version": "v1.8.1",
+        "type": "library",
+        "category": "http_router",
+        "supply_chain_risk": "MEDIUM",
+        "notes": "Maintenance mode. Adequate for short-lived lab apps."
+      },
+      {
+        "name": "github.com/gorilla/sessions",
+        "version": "v1.2.2",
+        "type": "library",
+        "category": "session",
+        "supply_chain_risk": "MEDIUM",
+        "notes": "Used as backend for middleware/session.go (cookie store)."
+      },
+      {
+        "name": "github.com/gorilla/securecookie",
+        "version": "v1.1.2",
+        "type": "library",
+        "category": "crypto",
+        "supply_chain_risk": "LOW",
+        "notes": "Indirect — secure cookie encoding/decoding."
+      },
+      {
+        "name": "github.com/mattn/go-sqlite3",
+        "version": "v1.14.22",
+        "type": "library",
+        "category": "database_driver",
+        "supply_chain_risk": "LOW",
+        "notes": "CGO binding to SQLite. Required for restaurant.db."
+      }
+    ],
+    "datastores": [
+      {
+        "name": "SQLite (restaurant.db)",
+        "engine": "sqlite3",
+        "tables": [
+          "users", "menu_items", "orders", "order_items",
+          "inventory", "reviews", "files", "scan_sessions",
+          "request_logs"
+        ],
+        "auth": "local file",
+        "encryption_at_rest": false,
+        "notes": "Plaintext password storage. WAL mode enabled."
+      }
+    ],
+    "external_services": [
+      {
+        "name": "User-supplied URLs via /api/import-menu (SSRF target)",
+        "trust": "untrusted",
+        "notes": "Server-side http.Get on attacker-controlled URL."
+      },
+      {
+        "name": "User-supplied URLs via /api/kitchen/recipes/view?source= (RFI target)",
+        "trust": "untrusted",
+        "notes": "Server-side http.Get on attacker-controlled URL when source starts with http(s)://."
+      }
+    ],
+    "build_and_tooling": [
+      {
+        "name": "Makefile (xVulnv2 build orchestration)",
+        "type": "build",
+        "notes": "Builds xvulnv2 binary and xvulnctl CLI. Manages reset/scan/report workflows."
+      },
+      {
+        "name": "Embedded report template (cmd/xvulnctl/report_template.html)",
+        "type": "asset",
+        "notes": "go:embed HTML template for benchmark reports."
+      }
+    ],
+    "vendored_or_artifacts": [
+      {
+        "name": "xvulnctl",
+        "type": "binary",
+        "notes": "Pre-built CLI binary present at repo root (supply-chain concern: should not be in source)."
+      },
+      {
+        "name": "xvulnv2",
+        "type": "binary",
+        "notes": "Pre-built server binary present at repo root."
+      }
+    ]
+  },
+  "security_relevant_dependencies": [
+    {
+      "name": "github.com/dgrijalva/jwt-go",
+      "version": "v3.2.0+incompatible",
+      "risk": "HIGH",
+      "rationale": "Archived upstream. Has multiple historical CVEs. However, the lab does NOT use this library — it ships a custom HMAC-SHA256 + base64url JWT implementation in handlers/advanced_lab.go (issueLabJWT/parseLabJWT). The dependency is present in go.mod only to be flagged by SCA scanners.",
+      "reachable": false,
+      "audit_verdict": "Kept in go.mod for benchmark SCA, but not used in code paths. Vulnerabilities would not be reachable."
+    },
+    {
+      "name": "github.com/mattn/go-sqlite3",
+      "version": "v1.14.22",
+      "risk": "LOW",
+      "rationale": "CGO SQLite driver. No known critical CVEs at version; standard upstream quality."
+    },
+    {
+      "name": "github.com/gorilla/sessions",
+      "version": "v1.2.2",
+      "risk": "MEDIUM",
+      "rationale": "Maintenance-mode library. Lab uses it for cookie-backed sessions with hardcoded default secret. The library itself is sound; the misuse is in the application config (see finding F-A5)."
+    }
+  ],
+  "shelled_out_binaries": [],
+  "static_assets": [
+    {
+      "path": "./static/index.html",
+      "type": "spa_shell",
+      "auth": "public",
+      "notes": "SPA served on :4444. Single-file frontend containing all page templates and API call logic."
+    },
+    {
+      "path": "./static/assets/*",
+      "type": "css_js_images",
+      "auth": "public",
+      "notes": "Static frontend assets."
+    },
+    {
+      "path": "./static/uploads/menus/*",
+      "type": "upload_target",
+      "auth": "session (any user)",
+      "notes": "Publicly served via /static/uploads/menus/. Any authenticated user can upload arbitrary content (V15)."
+    },
+    {
+      "path": "./static/exports/tmp/*",
+      "type": "export_target",
+      "auth": "session (owning user, but predictable filenames)",
+      "notes": "Publicly served invoice exports with predictable names (V19)."
+    },
+    {
+      "path": "./uploads/*",
+      "type": "sample_files",
+      "auth": "none (path traversal endpoint)",
+      "notes": "V13 path traversal target."
+    },
+    {
+      "path": "./recipes/*",
+      "type": "sample_files",
+      "auth": "none (when advanced_vulns enabled)",
+      "notes": "V17 LFI/RFI target."
+    },
+    {
+      "path": "./logs/requests.log",
+      "type": "log_file",
+      "auth": "filesystem",
+      "notes": "HTTP request log file."
+    }
+  ],
+  "trust_boundaries": [
+    {
+      "id": "TB-1",
+      "name": "Public Internet → Backend (:4443)",
+      "controls": "CORS (echo origin + credentials), Logger middleware, LocalhostOnly on /api/reset (default)",
+      "weakness": "CORS allows credentials with any origin. No rate limiting. No auth on most read endpoints."
+    },
+    {
+      "id": "TB-2",
+      "name": "Public Internet → Frontend (:4444)",
+      "controls": "Static file server, ConsoleLogger (not persisted)",
+      "weakness": "No CSP, X-Frame-Options, or other security headers. SPA content is not locked down."
+    },
+    {
+      "id": "TB-3",
+      "name": "Browser Session → Authenticated API",
+      "controls": "Gorilla session cookie (HttpOnly, SameSite=None, Secure=false)",
+      "weakness": "SameSite=None is needed for cross-port SPA but combined with credentialed CORS echo enables cross-origin session abuse (V12 + CORS)."
+    },
+    {
+      "id": "TB-4",
+      "name": "User → Admin Routes",
+      "controls": "X-Admin-Token header check OR session presence (no role verification)",
+      "weakness": "Hardcoded bypass token. Session fallback doesn't check role==admin (V07)."
+    },
+    {
+      "id": "TB-5",
+      "name": "Process → Filesystem",
+      "controls": "filepath.Join in some places, no auth on /api/files",
+      "weakness": "Path traversal on /api/files (V13). LFI on /api/kitchen/recipes/view (V17). Predictable filenames in /static/exports/tmp (V19)."
+    },
+    {
+      "id": "TB-6",
+      "name": "Process → External Network",
+      "controls": "None for /api/import-menu; rate-limited (in-memory) for /api/kitchen/recipes/view",
+      "weakness": "SSRF on /api/import-menu (V04). RFI on /api/kitchen/recipes/view when source starts with http(s):// (V17)."
+    },
+    {
+      "id": "TB-7",
+      "name": "Process → SQLite DB",
+      "controls": "Parameterized queries in most places; raw concatenation in V01/V02/various",
+      "weakness": "SQL injection in /api/menu/{id}, /api/menu?category=, /api/search?q= (V01, V02). Also in /api/admin/menu/upload-image filename (not exploitable but sloppy)."
+    },
+    {
+      "id": "TB-8",
+      "name": "Process → JWT validation",
+      "controls": "Custom HS256 in handlers/advanced_lab.go (issueLabJWT/parseLabJWT)",
+      "weakness": "alg=none accepted, no exp/iss/aud checks, hardcoded weak secret, signature check bypass when len(parts)==2 (V20)."
+    }
+  ],
+  "trust_boundary_crossings": [
+    "Untrusted JSON body → DB write (no schema validation in several handlers)",
+    "Untrusted URL → outbound HTTP (SSRF/RFI)",
+    "Untrusted path segment → os.ReadFile (LFI)",
+    "Untrusted query param → SQL string (SQLi)",
+    "Untrusted JWT → privilege escalation",
+    "Untrusted multipart filename → public file system (V15)",
+    "Untrusted header (X-Admin-Token) → admin-only data"
+  ]
+}

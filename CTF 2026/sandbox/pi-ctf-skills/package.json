@@ -1,0 +1,19 @@
+{
+  "name": "pi-ctf-skills",
+  "version": "1.0.0",
+  "description": "CTF challenge-solving skills for Pi — web, pwn, crypto, reverse, forensics, osint, malware, misc",
+  "type": "module",
+  "license": "MIT",
+  "keywords": [
+    "pi-package",
+    "pi",
+    "ctf",
+    "security",
+    "skills"
+  ],
+  "pi": {
+    "skills": [
+      "C:/Users/User/Downloads/CTF 2026/sandbox/ctf-skills"
+    ]
+  }
+}

@@ -1,0 +1,29 @@
+--- Impacket low-level session setup ---
+  Connected. Current dialect: 785
+  Server OS: ''
+  Server Name: ''
+  Remote Host: '10.181.33.90'
+  getClientName: ERR 'ClientName'
+  getCredentials: ('', '', '', '', '', '', None, None)
+  getDialect: 785
+  getFile: ERR SMBConnection.getFile() missing 3 required positional arguments: 'shareName', 'pathName', and 'callback'
+  getFileEx: ERR SMBConnection.getFileEx() missing 3 required positional arguments: 'shareName', 'pathName', and 'callback'
+  getIOCapabilities: {'MaxReadSize': 1048576, 'MaxWriteSize': 1048576}
+  getNMBServer: <impacket.nmb.NetBIOSTCPSession object at 0x0000025480EF8080>
+  getRemoteHost: '10.181.33.90'
+  getRemoteName: '10.181.33.90'
+  getSMBServer: <impacket.smb3.SMB3 object at 0x0000025483002DB0>
+  getServerDNSDomainName: ''
+  getServerDNSHostName: ''
+  getServerDomain: ''
+  getServerName: ''
+  getServerOS: ''
+  getServerOSBuild: ERR 'ServerOSBuild'
+  getServerOSMajor: ERR 'ServerOSMajor'
+  getServerOSMinor: ERR 'ServerOSMinor'
+  getSessionKey: b''
+  queryInfo: ERR SMBConnection.queryInfo() missing 2 required positional arguments: 'treeId' and 'fileId'
+  setInfo: ERR SMBConnection.setInfo() missing 4 required positional arguments: 'treeId', 'fileId', 'fileInfoClass', and 'infoData'
+
+--- Trying net view / net session over 139 ---
+  ERR: Cannot request session (Called Name:10.181.33.90)

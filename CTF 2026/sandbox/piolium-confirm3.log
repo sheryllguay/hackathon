@@ -1,0 +1,3 @@
+[piolium] warning: C:\Users\User\.piolium\agent\auth.json is empty; syncing auth from C:\Users\User\.pi\agent\auth.json.
+Synced auth from C:\Users\User\.pi\agent\auth.json into C:\Users\User\.piolium\agent\auth.json
+Failed to run pi: spawnSync pi ENOENT
